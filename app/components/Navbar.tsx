@@ -3,7 +3,6 @@
 import { ThemeToggle } from "./ThemeToggle"
 import { Logo } from "./Logo"
 import { Button } from "@/components/ui/button"
-import { Toaster } from "@/components/ui/toaster" 
 import { useToast } from "@/hooks/use-toast"
 
 export default function Navbar() {
