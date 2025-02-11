@@ -71,7 +71,7 @@ export default async function Home() {
         </div>
 
         <div className="text-sm text-muted-foreground text-center mt-6 space-y-1 italic">
-          <p>Note: Displayed prices are preliminary and will be updated at launch.</p>
+          <p>Note: Prices shown are placeholder values and will be determined at launch.</p>
           <p>Images shown are placeholders and do not represent final products.</p>
         </div>
       </main>
