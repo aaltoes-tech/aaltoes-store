@@ -25,35 +25,63 @@ model User {
   @@map("users")
 }
 
-model Products {
-  id         String    @id @default(cuid())
-  name       String
-  price      Float
+model Product {
+  id          String       @id @default(cuid())
+  name        String
+  price       Float
   description String
-  image      String
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  image       String
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   @@map("products")
 }
 
 model Cart {
-  id         String    @id @default(cuid())
-  user_id    String
-  user       User      @relation(fields: [user_id], references: [id])
-  product    Products[] 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id        String     @id @default(cuid())
+  user_id   String
+  user      User       @relation(fields: [user_id], references: [id])
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   @@map("carts")
 }
 
+model CartItem {
+  id        String   @id @default(cuid())
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  cartId    String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("cart_items")
+}
+
 model Order {
-  id         String    @id @default(cuid())
-  user_id    String
-  user       User      @relation(fields: [user_id], references: [id])
-  product    Products[] 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id        String      @id @default(cuid())
+  user_id   String
+  user      User        @relation(fields: [user_id], references: [id])
+  items     OrderItem[]
+  status    OrderStatus @default(PENDING)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
   @@map("orders")
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+  quantity  Int      @default(1)
+  price     Float    // Store the price at time of purchase
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("order_items")
 }
 
 model Account {
@@ -103,4 +131,12 @@ enum ChatRole {
   user
   system
   assistant
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }
