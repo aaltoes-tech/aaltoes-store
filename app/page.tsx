@@ -37,7 +37,7 @@ export default async function Home() {
             Welcome to Aaltoes Brand Store
           </h1>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl">
-            Our shop is coming soon! Here's a preview of what's to come.
+            Our shop is coming soon! Here&apos;s a preview of what&apos;s to come.
           </p>
         </div>
         
