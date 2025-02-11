@@ -7,8 +7,8 @@ import "./globals.css"
 
 
 export const metadata: Metadata = {
-  title: "Aaltoes Shop",
-  description: "Aaltoes Shop",
+  title: "Aaltoes Store",
+  description: "Aaltoes Store",
 };
 
 export default function RootLayout({
