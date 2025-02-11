@@ -56,4 +56,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## License
 
-MIT License
+Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for the full license text.
