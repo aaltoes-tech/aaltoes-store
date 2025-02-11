@@ -63,17 +63,26 @@ export default async function Home() {
   return (
     <>
       <Navbar />
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex flex-col items-center mb-12">
-          {products && (
-            <h1 className="text-3xl text-muted-foreground font-sans text-center">
-              Coming Soon
-            </h1>
+      <main className="container mx-auto px-4 py-16">
+        <div className="flex flex-col items-center space-y-4 mb-16 text-center">
+          <h1 className="text-4xl font-bold tracking-tight text-foreground">
+            Welcome to Aaltoes Brand Store
+          </h1>
+          {products.length === 0 && (
+            <p className="text-lg text-muted-foreground max-w-2xl">
+              The products will be available soon. Stay tuned!
+            </p>
           )}
         </div>
         
         {products && (
-          <Suspense fallback={<div>Loading products...</div>}>
+          <Suspense 
+            fallback={
+              <div className="flex items-center justify-center min-h-[200px] text-muted-foreground">
+                Loading products...
+              </div>
+            }
+          >
             <ProductGrid products={products} />
           </Suspense>
         )}
