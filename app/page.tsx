@@ -47,12 +47,11 @@ export default async function Home() {
               key={product.id} 
               className="border rounded-lg overflow-hidden shadow-lg bg-card"
             >
-              <div className="aspect-[3/2] relative bg-muted">
+              <div className="aspect-[3/2] relative">
                 <Image 
                   src={product.image}
                   alt={product.name}
                   fill
-                  className="object-cover opacity-50"
                 />
               </div>
               <div className="p-4">
