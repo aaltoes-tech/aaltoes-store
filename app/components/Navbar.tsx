@@ -21,7 +21,6 @@ export default function Navbar() {
         <div className="flex items-center">
           <Logo />
         </div>
-        
         <div className="flex items-center space-x-4">
           <ThemeToggle />
           <Button onClick={handleSignIn}>
