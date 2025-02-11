@@ -1,12 +1,8 @@
-import prisma  from '@/lib/prisma'
 import Image from 'next/image'
 import { Suspense } from 'react'
 import Navbar from './components/Navbar'
 
-async function getProducts() {
-  const products = await prisma.product.findMany()
-  return products
-}
+
 
 interface Product {
   id: string
@@ -58,7 +54,7 @@ function ProductGrid({ products }: { products: Product[] }) {
 }
 
 export default async function Home() {
-  const products = await getProducts()
+  const products = undefined
 
   return (
     <>
@@ -68,14 +64,14 @@ export default async function Home() {
           <h1 className="text-4xl font-bold tracking-tight text-foreground">
             Welcome to Aaltoes Brand Store
           </h1>
-          {products.length === 0 && (
+          {products==undefined && (
             <p className="text-lg text-muted-foreground max-w-2xl">
               The products will be available soon. Stay tuned!
             </p>
           )}
         </div>
         
-        {products && (
+        {products!=undefined && (
           <Suspense 
             fallback={
               <div className="flex items-center justify-center min-h-[200px] text-muted-foreground">
