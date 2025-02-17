@@ -1,11 +1,23 @@
-import { PrismaClient } from "@prisma/client"
+import { Pool } from "@neondatabase/serverless";
+import { PrismaNeon } from "@prisma/adapter-neon";
+import { PrismaClient } from "@prisma/client";
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
+const prismaClientSingleton = () => {
+  if (process.env.DATABASE_ENV==="docker") {
+    return new PrismaClient();
+  } else {
+    const neon = new Pool({ connectionString: process.env.DATABASE_URL });
+    const adapter = new PrismaNeon(neon);
+    return new PrismaClient({ adapter });
+  }
+};
+
+declare global {
+  var prismaGlobal: undefined | ReturnType<typeof prismaClientSingleton>;
 }
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient()
+const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma
+export default prisma;
 
-export default prisma
+if (process.env.NODE_ENV !== "production") globalThis.prismaGlobal = prisma;
