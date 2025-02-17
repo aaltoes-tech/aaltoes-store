@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button"
 import { signIn, signOut, useSession } from "next-auth/react";
 
 export default function Navbar() {
-  const { data: session, status } = useSession();
-
+  const { status } = useSession();
+  
   return (
     <nav>
       <div className="container mx-auto px-4 py-6 flex justify-between items-center">
@@ -17,10 +17,7 @@ export default function Navbar() {
         <div className="flex items-center space-x-4">
           <ThemeToggle />
           {status === "authenticated" ? (
-            <Button
-              variant="default"
-              onClick={() => signOut()}
-            >
+            <Button variant="default" onClick={() => signOut()}>
               Sign out
             </Button>
           ) : status !== "loading" && (
