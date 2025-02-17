@@ -1,0 +1,32 @@
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import NextAuth, { AuthOptions } from "next-auth";
+import { Adapter } from "next-auth/adapters";
+import GoogleProvider from 'next-auth/providers/google'
+import prisma from "./prisma";
+
+export const authConfig: AuthOptions = {
+  adapter: PrismaAdapter(prisma) as Adapter,
+  theme: {
+    brandColor: "#000000",
+    logo: "/aaltoes.svg",
+    buttonText: "#FFFFFF",
+    colorScheme: "auto"
+  },
+  callbacks: {
+    session({ session, user }) {
+      if (session.user) {
+        session.user.role = user.role;
+        session.user.quota = user.quota;
+        session.user.active = user.active;
+      }
+      return session;
+    },
+  },
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID ?? '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
+    }),
+  ],
+  secret: process.env.NEXTAUTH_SECRET,
+}; 

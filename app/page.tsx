@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import Navbar from './components/Navbar'
-import { Button } from '@/components/ui/button'
-
+import { ProductButton } from './components/ProductButton'
 
 export default async function Home() {
   const placeholderProducts = [
@@ -58,12 +57,7 @@ export default async function Home() {
                 <h2 className="text-lg md:text-xl font-semibold mb-2">{product.name}</h2>
                 <p className="text-sm md:text-base text-muted-foreground mb-2">{product.description}</p>
                 <p className="text-lg font-bold">${product.price}</p>
-                <Button 
-                  className="mt-4 w-full text-sm md:text-base" 
-                  disabled
-                >
-                  Coming Soon
-                </Button>
+                <ProductButton />
               </div>
             </div>
           ))}

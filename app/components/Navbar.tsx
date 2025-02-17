@@ -3,17 +3,10 @@
 import { ThemeToggle } from "./ThemeToggle"
 import { Logo } from "./Logo"
 import { Button } from "@/components/ui/button"
-import { useToast } from "@/hooks/use-toast"
+import { signIn, signOut, useSession } from "next-auth/react";
 
 export default function Navbar() {
-  const { toast } = useToast()
-
-  const handleSignIn = () => {
-    toast({
-      description: "🚧 Authentication is not available yet. Website is under development.",
-      duration: 3000,
-    })
-  }
+  const { data: session, status } = useSession();
 
   return (
     <nav>
@@ -23,9 +16,24 @@ export default function Navbar() {
         </div>
         <div className="flex items-center space-x-4">
           <ThemeToggle />
-          <Button onClick={handleSignIn}>
-            Sign in
-          </Button>
+          {status === "authenticated" ? (
+            <Button
+              variant="default"
+              onClick={() => signOut()}
+            >
+              Sign out
+            </Button>
+          ) : status !== "loading" && (
+            <Button
+              variant="default"
+              onClick={(e) => {
+                e.preventDefault()
+                signIn('google')
+              }}
+            >
+              Sign in
+            </Button>
+          )}
         </div>
       </div>
     </nav>
