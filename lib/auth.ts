@@ -20,9 +20,5 @@ export const authOptions: NextAuthOptions = {
         role: user.role,
       },
     }),
-  },
-  pages: {
-    signIn: '/auth/signin',
-    error: '/auth/error',
-  },
+  }
 };
