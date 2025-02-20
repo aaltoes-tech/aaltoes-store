@@ -39,7 +39,7 @@ export function ProductDetail({ product, isOpen, onClose }: ProductDetailProps) 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="w-full aspect-square relative">
             <Image
-              src={product.image || '/placeholder-image.jpg'}
+              src={'/placeholder-image.jpg'}
               alt={product.name}
               fill
               sizes="(max-width: 768px) 100vw, 600px"
