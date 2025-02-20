@@ -38,7 +38,7 @@ import { ProductType, Size } from "@/app/lib/constants"
 
 interface ProductTableProps {
   products: Product[]
-  onProductAdded: () => Promise<void>
+  onProductAdded: () => Promise<Product[]>
 }
 
 export function ProductTable({ products: initialProducts, onProductAdded }: ProductTableProps) {
@@ -62,11 +62,9 @@ export function ProductTable({ products: initialProducts, onProductAdded }: Prod
       
       if (!res.ok) throw new Error()
       
-      const updatedProducts = products.map(p => 
-        p.id === id ? { ...p, status: ProductStatus.removed } : p
-      )
-      setProducts(updatedProducts)
-      setFilteredProducts(updatedProducts)
+      const freshProducts = await onProductAdded()
+      setProducts(freshProducts)
+      setFilteredProducts(freshProducts)
       
       toast({ description: "Product removed successfully" })
     } catch {
@@ -87,7 +85,10 @@ export function ProductTable({ products: initialProducts, onProductAdded }: Prod
       
       if (!res.ok) throw new Error()
       
-      await onProductAdded()
+      const freshProducts = await onProductAdded()
+      setProducts(freshProducts)
+      setFilteredProducts(freshProducts)
+      
       setEditingProduct(null)
       toast({ description: "Product updated successfully" })
     } catch {
@@ -204,19 +205,19 @@ export function ProductTable({ products: initialProducts, onProductAdded }: Prod
           </p>
         </div>
       ) : (
-        <div className="overflow-y-auto max-h-[500px] mt-4">
+        <div className="max-h-[500px] mt-4">
           <Table>
-            <TableHeader>
+            <TableHeader className="sticky top-0 bg-background border-b">
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead className="text-center">Type</TableHead>
-                <TableHead className="text-center">Sizes</TableHead>
-                <TableHead className="text-center">Price</TableHead>
-                <TableHead className="text-center">Status</TableHead>
-                <TableHead className="text-center">Actions</TableHead>
+                <TableHead className="w-[200px]">Name</TableHead>
+                <TableHead className="w-[100px] text-center">Type</TableHead>
+                <TableHead className="w-[150px] text-center">Sizes</TableHead>
+                <TableHead className="w-[100px] text-right">Price</TableHead>
+                <TableHead className="w-[100px] text-center">Status</TableHead>
+                <TableHead className="w-[100px] text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody >
               {filteredProducts.map((product) => (
                 <TableRow key={product.id}>
                   <TableCell>{product.name}</TableCell>
