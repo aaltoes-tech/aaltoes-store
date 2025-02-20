@@ -1,31 +1,17 @@
-import Image from 'next/image'
+import { prisma } from "@/lib/prisma"
 import Navbar from './components/Navbar'
-import { ProductButton } from './components/ProductButton'
+import { ProductGrid } from './components/ProductGrid'
+import { ProductType, Size } from "@/app/lib/constants"
+import { Product } from "@prisma/client"
+
+type ProductWithDetails = Product & {
+  type: ProductType;
+  sizes: Size[];
+  status: 'active' | 'removed';
+}
 
 export default async function Home() {
-  const placeholderProducts = [
-    {
-      id: '1',
-      name: 'Aaltoes Hoodie',
-      description: 'Comfortable hoodie with Aaltoes logo',
-      price: 49.99,
-      image: '/hoodie.jpg'
-    },
-    {
-      id: '2',
-      name: 'Aaltoes T-Shirt',
-      description: 'Classic cotton t-shirt',
-      price: 29.99,
-      image: '/t-shirt.jpg'
-    },
-    {
-      id: '3',
-      name: 'Aaltoes Cap',
-      description: 'Stylish cap',
-      price: 24.99,
-      image: '/cap.jpg'
-    }
-  ]
+  const products = await getProducts() as ProductWithDetails[]
 
   return (
     <>
@@ -36,32 +22,11 @@ export default async function Home() {
             Welcome to Aaltoes Brand Store
           </h1>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl">
-            Our store is coming soon! Here&apos;s a preview of what&apos;s to come.
+            Start by browsing our products
           </p>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {placeholderProducts.map((product) => (
-            <div 
-              key={product.id} 
-              className="border rounded-lg overflow-hidden shadow-lg bg-card"
-            >
-              <div className="aspect-[3/2] relative">
-                <Image 
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                />
-              </div>
-              <div className="p-4">
-                <h2 className="text-lg md:text-xl font-semibold mb-2">{product.name}</h2>
-                <p className="text-sm md:text-base text-muted-foreground mb-2">{product.description}</p>
-                <p className="text-lg font-bold">${product.price}</p>
-                <ProductButton />
-              </div>
-            </div>
-          ))}
-        </div>
+        <ProductGrid products={products} />
 
         <div className="text-sm text-muted-foreground text-center mt-6 space-y-1 italic">
           <p>Note: Prices shown are placeholder values and will be determined at launch.</p>
@@ -70,4 +35,15 @@ export default async function Home() {
       </main>
     </>
   )
+}
+
+async function getProducts() {
+  return prisma.product.findMany({
+    where: {
+      status: 'active' 
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  })
 }

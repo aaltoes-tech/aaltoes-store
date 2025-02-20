@@ -4,8 +4,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url  	    = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -13,28 +13,32 @@ model User {
   name          String?
   email         String    @unique
   emailVerified DateTime?
-  image         String?
-  role          String   @default("User")
-  accounts      Account[] 
-  sessions      Session[] 
+  image         String    @default("/placeholder-image.jpg")
+  role          String    @default("User")
+  accounts      Account[]
+  sessions      Session[]
   cart          Cart[]
   orders        Order[]
-  active        Boolean  @default(true)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+
   @@map("users")
 }
 
 model Product {
-  id          String       @id @default(cuid())
+  id          String      @id @default(cuid())
   name        String
-  price       Float
   description String
-  image       String
+  price       Float
+  image       String      @default("/placeholder-image.jpg")
+  type        ProductType
+  sizes       Size[]      @default([])
+  status      ProductStatus @default(active)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   cartItems   CartItem[]
   orderItems  OrderItem[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+
   @@map("products")
 }
 
@@ -45,18 +49,19 @@ model Cart {
   items     CartItem[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+
   @@map("carts")
 }
 
 model CartItem {
-  id        String   @id @default(cuid())
-  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  id        String  @id @default(cuid())
+  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
   cartId    String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String
-  quantity  Int      @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  quantity  Int     @default(1)
+  size      Size?   // Optional because not all products have sizes
+
   @@map("cart_items")
 }
 
@@ -66,21 +71,25 @@ model Order {
   user      User        @relation(fields: [user_id], references: [id])
   items     OrderItem[]
   status    OrderStatus @default(PENDING)
+  phone_number String @default("")
+  comment   String      @default("")
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
+  total     Float
+
   @@map("orders")
 }
 
 model OrderItem {
-  id        String   @id @default(cuid())
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  id        String  @id @default(cuid())
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId   String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String
-  quantity  Int      @default(1)
-  price     Float    // Store the price at time of purchase
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  quantity  Int     @default(1)
+  total     Float
+  size      Size?   // Add size field to match CartItem
+
   @@map("order_items")
 }
 
@@ -131,7 +140,29 @@ model VerificationToken {
 enum OrderStatus {
   PENDING
   PROCESSING
-  SHIPPED
   DELIVERED
   CANCELLED
+}
+
+enum ProductType {
+  TSHIRT
+  HOODIE
+  STICKER
+  MUG
+  HAT
+}
+
+enum Size {
+  XS
+  S
+  M
+  L
+  XL
+  XXL
+  ONESIZE
+}
+
+enum ProductStatus {
+  active
+  removed
 }
