@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma"
 import Navbar from './components/Navbar'
 import { ProductGrid } from './components/ProductGrid'
 
+export const dynamic = 'force-dynamic'
 
 export default async function Home() {
   const products = await prisma.product.findMany({
