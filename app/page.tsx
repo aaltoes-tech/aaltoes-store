@@ -1,17 +1,17 @@
 import { prisma } from "@/lib/prisma"
 import Navbar from './components/Navbar'
 import { ProductGrid } from './components/ProductGrid'
-import { ProductType, Size } from "@/app/lib/constants"
-import { Product } from "@prisma/client"
 
-type ProductWithDetails = Product & {
-  type: ProductType;
-  sizes: Size[];
-  status: 'active' | 'removed';
-}
 
 export default async function Home() {
-  const products = await getProducts() as ProductWithDetails[]
+  const products = await prisma.product.findMany({
+    where: {
+      status: 'active'
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  })
 
   return (
     <>
@@ -35,15 +35,4 @@ export default async function Home() {
       </main>
     </>
   )
-}
-
-async function getProducts() {
-  return prisma.product.findMany({
-    where: {
-      status: 'active' 
-    },
-    orderBy: {
-      createdAt: 'desc'
-    }
-  })
 }

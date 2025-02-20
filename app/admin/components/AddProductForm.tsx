@@ -44,17 +44,18 @@ export function AddProductForm({ onClose, onSuccess }: AddProductFormProps) {
     }
 
     try {
-      const res = await fetch("/api/products", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const response = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...data,
+          status: 'active'  // Make sure this is set
+        }),
       })
       
-      const json = await res.json()
+      const json = await response.json()
       
-      if (!res.ok) {
+      if (!response.ok) {
         throw new Error(json.error || "Failed to create product")
       }
       
