@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
 import { authOptions } from "@/lib/auth"
 import { ProductType, Size } from "@/app/lib/constants"
+import { revalidatePath } from "next/cache"
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
@@ -25,6 +26,9 @@ export async function POST(req: Request) {
       }
     })
 
+    revalidatePath('/')  // Revalidate main page
+    revalidatePath('/admin')  // Revalidate admin page
+    
     return NextResponse.json(product)
   } catch (error) {
     console.error('Create product error:', error)

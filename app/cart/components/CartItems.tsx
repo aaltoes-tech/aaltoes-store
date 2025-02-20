@@ -125,7 +125,7 @@ export function CartItems({ items: initialItems }: CartItemsProps) {
                     <div className="flex gap-2 mt-2">
                       {item.size && (
                         <Badge variant="outline" className="text-xs">
-                          {item.size}
+                          {item.product.type}
                         </Badge>
                       )}
                       {item.product.status === 'removed' && (
