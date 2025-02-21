@@ -56,10 +56,12 @@ export function ProductTable({ products: initialProducts, onProductAdded }: Prod
   async function handleDelete(id: string) {
     try {
       const res = await fetch(`/api/products/${id}`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: ProductStatus.removed })
       })
+
+      console.log(res)
       
       if (!res.ok) throw new Error()
       
@@ -102,18 +104,16 @@ export function ProductTable({ products: initialProducts, onProductAdded }: Prod
   async function handleRestore(id: string) {
     try {
       const res = await fetch(`/api/products/${id}`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: ProductStatus.active })
       })
       
       if (!res.ok) throw new Error()
       
-      const updatedProducts = products.map(p => 
-        p.id === id ? { ...p, status: ProductStatus.active } : p
-      )
-      setProducts(updatedProducts)
-      setFilteredProducts(updatedProducts)
+      const freshProducts = await onProductAdded()
+      setProducts(freshProducts)
+      setFilteredProducts(freshProducts)
       
       toast({ description: "Product restored successfully" })
     } catch {
@@ -165,6 +165,12 @@ export function ProductTable({ products: initialProducts, onProductAdded }: Prod
     setSizeFilter("all")
     setSortOrder("")
     setFilteredProducts(products)
+  }
+
+  const getImageUrl = (url: string) => {
+    return url !== undefined && (url.startsWith('https') || url.startsWith('/'))
+      ? url + "?img-width=100&img-format=webp"
+      : '/placeholder-image.jpg'
   }
 
   return (
@@ -224,9 +230,9 @@ export function ProductTable({ products: initialProducts, onProductAdded }: Prod
                   <TableCell>
                     <div className="relative w-16 h-16 rounded-md overflow-hidden">
                       <Image
-                        src={product.image || '/placeholder-image.jpg'}
+                        src={getImageUrl(product.image)}
                         alt={product.name}
-                        key = {product.id+"-table"}
+                        key={product.id+"-table"}
                         fill
                         className="object-cover"
                         sizes="64px"

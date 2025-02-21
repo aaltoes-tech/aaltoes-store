@@ -5,42 +5,75 @@ import { authOptions } from "@/lib/auth"
 import sharp from 'sharp'
 import { type Crop } from 'react-image-crop'
 import { pinata } from "@/app/utils/config"
-import { ProductType, Size } from "@/app/lib/constants"
+import { ProductStatus, ProductType, Size } from "@/app/lib/constants"
 
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
-export async function DELETE(req: Request, { params }: RouteParams) {
+export async function PUT(req: Request, { params }: RouteParams) {
   const { id } = await params;
   const session = await getServerSession(authOptions)
-  
+
   if (!session?.user || session.user.role !== "Admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  try {
-    const product = await prisma.product.findUnique({
-      where: { id: id }
-    })
-    if (product?.image) {
-      const image = product.image.split('/').pop()
-      if (image) {
-        await pinata.unpin([image])
+  const data = await req.json()
+
+  console.log(data)
+  
+  if (data.status === ProductStatus.removed) {
+    try {
+      const product = await prisma.product.findUnique({
+        where: { id: id }
+      })
+  
+      if (!product) {
+        return NextResponse.json({ error: "Product not found" }, { status: 404 })
       }
+  
+      if (product.image) {
+        try {
+          const oldImage = product.image.split('/').pop()
+          if (oldImage) {
+            await pinata.unpin([oldImage])
+          }
+        } catch (error) {
+          console.error('Error deleting old image:', error)
+        }
+      }
+  
+      await prisma.product.update({
+        where: { id: id },
+        data: {
+          status: ProductStatus.removed,
+          image: "ss"
+        }
+      })
+      return NextResponse.json({ success: true })
+    } catch (error) {
+      console.error('Error deleting product:', error)
+      return NextResponse.json({ error: "Failed to delete product" }, { status: 500 })
     }
-    await prisma.product.delete({
-      where: { id: id }
-    })
-    
-    return new Response(null, { status: 204 })
-  } catch (error) {
-    console.error('Product deletion error:', error)
-    return NextResponse.json(
-      { error: "Failed to delete product" },
-      { status: 500 }
-    )
   }
+
+  if (data.status === ProductStatus.active) {
+    try {
+      await prisma.product.update({
+        where: { id: id },
+        data: {
+          status: ProductStatus.active
+        }
+      })
+      return NextResponse.json({ success: true })
+    } catch (error) {
+      console.error('Error activating product:', error)
+      return NextResponse.json({ error: "Failed to activate product" }, { status: 500 })
+    }
+  }
+
+  return NextResponse.json({ error: "Invalid status" }, { status: 400 })
 }
 
 export async function PATCH(req: Request, { params }: RouteParams) {
