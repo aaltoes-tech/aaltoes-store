@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ImageCropper } from "./image-cropper"
 import { type Crop } from 'react-image-crop'
-import { toast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
 
 interface InputFileProps {
   onChange?: (file: File, cropData?: Crop) => void
@@ -23,7 +23,7 @@ export function InputFile({
   required = false 
 }: InputFileProps) {
   const [cropFile, setCropFile] = useState<File | null>(null)
-
+  const { toast } = useToast()
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (file) {
