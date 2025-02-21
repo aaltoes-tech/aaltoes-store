@@ -157,7 +157,7 @@ export function OrderList({ initialOrders }: OrderListProps) {
                           {item.size && ` • ${item.size}`}
                         </p>
                       </div>
-                      <p className="font-medium">${item.total.toFixed(2)}</p>
+                      <p className="font-medium">{item.total.toFixed(2)} €</p>
                     </div>
                   ))}
                 </>
@@ -181,9 +181,9 @@ export function OrderList({ initialOrders }: OrderListProps) {
                 <div className="text-right">
                   <p className="text-sm font-medium">Total Amount</p>
                   <p className="text-2xl font-bold tracking-tight">
-                  ${order.total.toFixed(2)}
-                </p>
-              </div>
+                    {order.total.toFixed(2)} €
+                  </p>
+                </div>
               )}
             </div>
           </div>

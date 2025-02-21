@@ -81,7 +81,7 @@ export function ProductDetail({ product, isOpen, onClose }: ProductDetailProps) 
             </div>
 
             <div className="space-y-4">
-              <p className="text-3xl font-bold">${product.price}</p>
+              <p className="text-3xl font-bold">{product.price} €</p>
               
               {needsSize && (
                 <div className="space-y-2">

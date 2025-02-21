@@ -170,7 +170,7 @@ export function CartItems({ items: initialItems }: CartItemsProps) {
                   </div>
                 </td>
                 <td className="py-4 px-4 text-center font-medium">
-                  ${(item.product.price * item.quantity).toFixed(2)}
+                  {item.product.price * item.quantity} €
                 </td>
                 <td className="py-4 px-4 text-center">
                   <Button 
@@ -192,7 +192,7 @@ export function CartItems({ items: initialItems }: CartItemsProps) {
         <div className="flex justify-between items-center max-w-4xl mx-auto">
           <div className="text-lg font-medium flex items-center gap-2">
             <span>Total:</span>
-            <span>${total.toFixed(2)}</span>
+            <span>{total.toFixed(2)} €</span>
           </div>
           <div className="w-[200px]">
             <Button 

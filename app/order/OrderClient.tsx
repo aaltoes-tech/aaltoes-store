@@ -54,17 +54,9 @@ function OrderSummary({ subtotal, total }: { subtotal: number; total: number }) 
     <div className="border-t pt-6">
       <h3 className="text-lg font-semibold tracking-tight mb-4">Order Summary</h3>
       <div className="space-y-2">
-        <div className="flex justify-between text-muted-foreground">
-          <span>Subtotal</span>
-          <span>${subtotal.toFixed(2)}</span>
-        </div>
-        <div className="flex justify-between text-muted-foreground">
-          <span>Shipping</span>
-          <span>Free</span>
-        </div>
-        <div className="flex justify-between font-medium text-lg pt-4 border-t">
+        <div className="flex justify-between font-medium text-lg pt-4">
           <span>Total</span>
-          <span>${total.toFixed(2)}</span>
+          <span>{total.toFixed(2)} €</span>
         </div>
       </div>
       <div className="mt-4 p-4 bg-muted rounded-lg">

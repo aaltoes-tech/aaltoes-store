@@ -136,7 +136,7 @@ export function OrderDetails({ order }: OrderDetailsProps) {
                         )}
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">${item.total}</p>
+                        <p className="font-medium">{item.total} €</p>
                         <p className="text-sm text-muted-foreground">
                           Qty: {item.quantity}
                         </p>
@@ -155,7 +155,7 @@ export function OrderDetails({ order }: OrderDetailsProps) {
             <div className="flex justify-end">
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">Total Amount</p>
-                <p className="text-2xl font-bold">${order.total}</p>
+                <p className="text-2xl font-bold">{order.total} €</p>
               </div>
             </div>
           </div>

@@ -68,7 +68,7 @@ export function OrderDetails({ order, isOpen, onClose, onStatusChange }: OrderDe
                     )}
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">${item.total}</p>
+                    <p className="font-medium">{item.total} €</p>
                     <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                   </div>
                 </div>
@@ -79,7 +79,7 @@ export function OrderDetails({ order, isOpen, onClose, onStatusChange }: OrderDe
           <div className="pt-4 border-t space-y-4">
             <div className="flex justify-between">
               <p className="font-medium">Total</p>
-              <p className="font-medium">${order.total}</p>
+              <p className="font-medium">{order.total} €</p>
             </div>
 
             <div className="space-y-2">

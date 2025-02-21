@@ -256,7 +256,7 @@ export function ProductTable({ products: initialProducts, onProductAdded }: Prod
                       </div>
                     )}
                   </TableCell>
-                  <TableCell className="text-center">${product.price}</TableCell> 
+                  <TableCell className="text-center">{product.price} €</TableCell> 
                   <TableCell className="text-center">
                     <Badge variant={product.status === "active" ? "default" : "secondary"}>
                       {product.status}
