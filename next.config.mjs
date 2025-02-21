@@ -5,6 +5,9 @@ const nextConfig = {
       {
         hostname: "lh3.googleusercontent.com",
       },
+      {
+        hostname: "amaranth-defiant-snail-192.mypinata.cloud",
+      }
     ],
   },
 };

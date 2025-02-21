@@ -28,23 +28,39 @@ interface ProductDetailProps {
 
 export function ProductDetail({ product, isOpen, onClose }: ProductDetailProps) {
   const [selectedSize, setSelectedSize] = useState<Size>()
+  const [imageError, setImageError] = useState(false)
+  const [imageLoading, setImageLoading] = useState(true)
   const needsSize = PRODUCT_TYPE_CONFIG[product.type as keyof typeof PRODUCT_TYPE_CONFIG]?.hasSize
+
+  const imageUrl = product.image && 
+    (product.image.startsWith('https') || product.image.startsWith('/')) 
+    ? product.image 
+    : '/placeholder-image.jpg'
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[800px]">
+      <DialogContent className="sm:max-w-[1000px]">
         <DialogHeader>
           <DialogTitle className="text-2xl">{product.name}</DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="w-full aspect-square relative">
+            {imageLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-muted/10">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+              </div>
+            )}
             <Image
-              src={'/placeholder-image.jpg'}
+              src={imageError ? '/placeholder-image.jpg' : imageUrl + "?img-height=1200&img-format=webp"}
               alt={product.name}
               fill
-              sizes="(max-width: 768px) 100vw, 600px"
-              className="object-cover rounded-lg"
+              className={`object-contain rounded-md transition-opacity duration-300 ${
+                imageLoading ? 'opacity-0' : 'opacity-100'
+              }`}
+              sizes="(max-height: 1000px) 100vw, 50vw"
               priority
+              onError={() => setImageError(true)}
+              onLoadingComplete={() => setImageLoading(false)}
             />
           </div>
           <div className="flex flex-col space-y-4">

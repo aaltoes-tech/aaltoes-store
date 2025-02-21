@@ -16,6 +16,8 @@ import {
 import { PRODUCT_TYPE_CONFIG } from "@/app/lib/constants"
 import { Label } from "@/components/ui/label"
 import { Size as PrismaSize, ProductType as PrismaProductType } from "@prisma/client"
+import { InputFile } from "@/app/components/ui/input-file"
+import { type Crop } from 'react-image-crop'
 
 interface AddProductFormProps {
   onClose: () => void;
@@ -28,36 +30,31 @@ export function AddProductForm({ onClose, onSuccess }: AddProductFormProps) {
   const { toast } = useToast()
   const [type, setType] = useState<PrismaProductType>('TSHIRT')
   const [sizes, setSizes] = useState<PrismaSize[]>([])
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [cropData, setCropData] = useState<Crop | null>(null)
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setLoading(true)
 
     const formData = new FormData(e.currentTarget)
-    const data = {
-      name: formData.get("name") as string,
-      price: parseFloat(formData.get("price") as string),
-      description: formData.get("description") as string,
-      image: formData.get("image") as string,
-      type: type,
-      sizes: sizes
+    if (imageFile) {
+      formData.append('file', imageFile)
     }
+    if (cropData) {
+      formData.append('cropData', JSON.stringify(cropData))
+    }
+    formData.append('type', type)
+    formData.append('sizes', JSON.stringify(sizes))
+    formData.append('status', 'active')
 
     try {
       const response = await fetch('/api/products', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...data,
-          status: 'active'  // Make sure this is set
-        }),
+        body: formData,
       })
       
-      const json = await response.json()
-      
-      if (!response.ok) {
-        throw new Error(json.error || "Failed to create product")
-      }
+      if (!response.ok) throw new Error()
       
       toast({
         title: "Success",
@@ -108,11 +105,13 @@ export function AddProductForm({ onClose, onSuccess }: AddProductFormProps) {
           required
         />
       </div>
-      <div>
-        <Input
-          name="image"
-          placeholder="Image URL"
+      <div> 
+        <InputFile
           required
+          onChange={(file, crop) => {
+            setImageFile(file)
+            setCropData(crop || null)
+          }}
         />
       </div>
       <div className="grid gap-2">

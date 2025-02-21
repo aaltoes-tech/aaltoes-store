@@ -2,7 +2,6 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
 import { authOptions } from "@/lib/auth"
-import { revalidatePath } from "next/cache"
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -45,12 +44,15 @@ export async function PATCH(req: Request, { params }: RouteParams) {
 
     const product = await prisma.product.update({
       where: { id },
-      data: json
+      data: {
+        name: json.name,
+        description: json.description,
+        price: json.price,
+        sizes: json.sizes,
+        status: json.status,
+      }
     })
 
-    revalidatePath('/')  // Revalidate main page
-    revalidatePath('/admin')  // Revalidate admin page
-    
     return NextResponse.json(product)
   } catch (error) {
     console.error('Update product error:', error)

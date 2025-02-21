@@ -27,8 +27,11 @@ interface Order {
   items: OrderItem[]
 }
 
+interface OrderListProps {
+  initialOrders: Order[]
+}
 
-export function OrderList({ initialOrders }: { initialOrders: Order[] }) {
+export function OrderList({ initialOrders }: OrderListProps) {
   const [orders, setOrders] = useState(initialOrders)
   const [loading, setLoading] = useState(false)
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([
@@ -36,6 +39,8 @@ export function OrderList({ initialOrders }: { initialOrders: Order[] }) {
     "PROCESSING"
   ])
   const { toast } = useToast()
+  const [imageError, setImageError] = useState(false)
+  const [imageLoading, setImageLoading] = useState(true)
 
   async function cancelOrder(orderId: string) {
     setLoading(true)
@@ -70,6 +75,12 @@ export function OrderList({ initialOrders }: { initialOrders: Order[] }) {
   const filteredOrders = selectedStatuses.length === 0
     ? []
     : orders.filter(order => selectedStatuses.includes(order.status))
+
+  const getImageUrl = (url: string) => {
+    return url && (url.startsWith('http') || url.startsWith('/'))
+      ? url+"?img-width=100&img-format=webp"
+      : '/placeholder-image.jpg'
+  }
 
   return (
     <div className="space-y-8">
@@ -121,13 +132,22 @@ export function OrderList({ initialOrders }: { initialOrders: Order[] }) {
                   {order.items.map((item) => (
                     <div key={item.id} className="py-4 flex gap-4 items-center">
                       <div className="relative w-20 h-20 flex-shrink-0">
+                        {imageLoading && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-muted/10">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+                          </div>
+                        )}
                         <Image
-                          src={"/placeholder-image.jpg"}
+                          src={imageError ? '/placeholder-image.jpg' : getImageUrl(item.product.image)}
                           alt={item.product.name}
                           fill
+                          className={`object-cover rounded-md transition-opacity duration-300 ${
+                            imageLoading ? 'opacity-0' : 'opacity-100'
+                          }`}
                           sizes="80px"
-                          className="object-cover rounded-md"
                           priority
+                          onError={() => setImageError(true)}
+                          onLoadingComplete={() => setImageLoading(false)}
                         />
                       </div>
                       <div className="flex-1 space-y-1">

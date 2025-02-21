@@ -30,8 +30,16 @@ export function CartItems({ items: initialItems }: CartItemsProps) {
   const [items, setItems] = useState(initialItems)
   const { toast } = useToast()
   const router = useRouter()
+  const [imageError, setImageError] = useState(false)
+  const [imageLoading, setImageLoading] = useState(true)
 
   const hasRemovedProducts = items.some(item => item.product.status === 'removed')
+
+  const getImageUrl = (url: string) => {
+    return url && (url.startsWith('https') || url.startsWith('/'))
+      ? url + "?img-width=100&img-format=webp"
+      : '/placeholder-image.jpg'
+  }
 
   async function updateQuantity(itemId: string, newQuantity: number) {
     if (newQuantity < 1 || newQuantity > 10) return
@@ -108,14 +116,23 @@ export function CartItems({ items: initialItems }: CartItemsProps) {
             {items.map((item) => (
               <tr key={item.id} className="hover:bg-muted/50 transition-colors">
                 <td className="py-4 px-2 text-center">
-                  <div className="mx-auto w-14 h-14 relative rounded-md overflow-hidden">
+                  <div className="relative w-16 aspect-square mx-auto">
+                    {imageLoading && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-muted/10">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+                      </div>
+                    )}
                     <Image
-                      src={'/placeholder-image.jpg'}
+                      src={imageError ? '/placeholder-image.jpg' : getImageUrl(item.product.image)}
                       alt={item.product.name}
                       fill
-                      className="object-cover"
+                      className={`object-contain rounded-md transition-opacity duration-300 ${
+                        imageLoading ? 'opacity-0' : 'opacity-100'
+                      }`}
                       sizes="64px"
                       priority
+                      onError={() => setImageError(true)}
+                      onLoadingComplete={() => setImageLoading(false)}
                     />
                   </div>
                 </td>

@@ -9,6 +9,7 @@ import { OrderActions } from "./OrderActions"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Product } from "@prisma/client"
+import { useState } from "react"
 
 interface OrderItem {
   id: string
@@ -35,6 +36,8 @@ interface OrderDetailsProps {
 }
 
 export function OrderDetails({ order }: OrderDetailsProps) {
+  const [imageError, setImageError] = useState(false)
+
   return (
     <main className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="space-y-8">
@@ -105,12 +108,13 @@ export function OrderDetails({ order }: OrderDetailsProps) {
                 >
                   <div className="relative w-20 h-20">
                     <Image
-                      src={"/placeholder-image.jpg"}
+                      src={imageError ? '/placeholder-image.jpg' : item.product.image+"?img-width=800&img-format=webp"}
                       alt={item.product.name}
                       fill
                       className="object-cover rounded-md"
                       sizes="80px"
                       priority
+                      onError={() => setImageError(true)}
                     />
                   </div>
                   <div className="flex-1">

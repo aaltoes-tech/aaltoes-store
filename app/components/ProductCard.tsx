@@ -19,24 +19,43 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const [imageError, setImageError] = useState(false)
+  const [imageLoading, setImageLoading] = useState(true)
   const [showDetail, setShowDetail] = useState(false)
   const needsSize = PRODUCT_TYPE_CONFIG[product.type]?.hasSize
+
+  // Show placeholder if no URL or invalid URL
+  const imageUrl = product.image && 
+    (product.image.startsWith('https') || product.image.startsWith('/')) 
+    ? product.image 
+    : '/placeholder-image.jpg'
+
+  console.log(product)
 
   return (
     <>
       <div className="bg-background rounded-lg border shadow-sm overflow-hidden flex flex-col h-[380px]">
         <div 
-          className="relative w-full h-48 shrink-0 cursor-pointer"
-          style={{ minHeight: '12rem' }}
+          className="relative w-full aspect-square shrink-0 cursor-pointer"
           onClick={() => setShowDetail(true)}
         >
+          {/* Loading Spinner */}
+          {imageLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-muted/10">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+            </div>
+          )}
+          
           <Image
-            src={'/placeholder-image.jpg'}
+            src={imageError ? '/placeholder-image.jpg' : imageUrl + "?img-height=1000&img-format=webp"}
             alt={product.name}
             fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover"
+            className={`object-cover transition-opacity duration-300 ${
+              imageLoading ? 'opacity-0' : 'opacity-100'
+            }`}
             priority
+            onError={() => setImageError(true)}
+            onLoadingComplete={() => setImageLoading(false)}
           />
         </div>
         <div className="p-4 flex flex-col flex-1">
