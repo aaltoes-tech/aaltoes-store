@@ -125,6 +125,7 @@ export function CartItems({ items: initialItems }: CartItemsProps) {
                     <Image
                       src={imageError ? '/placeholder-image.jpg' : getImageUrl(item.product.image)}
                       alt={item.product.name}
+                      key={`${item.product.id}-${Date.now()}`}
                       fill
                       className={`object-contain rounded-md transition-opacity duration-300 ${
                         imageLoading ? 'opacity-0' : 'opacity-100'

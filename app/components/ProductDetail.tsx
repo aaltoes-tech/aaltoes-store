@@ -53,6 +53,7 @@ export function ProductDetail({ product, isOpen, onClose }: ProductDetailProps) 
             <Image
               src={imageError ? '/placeholder-image.jpg' : imageUrl + "?img-height=1200&img-format=webp"}
               alt={product.name}
+              key={product.id}
               fill
               className={`object-contain rounded-md transition-opacity duration-300 ${
                 imageLoading ? 'opacity-0' : 'opacity-100'

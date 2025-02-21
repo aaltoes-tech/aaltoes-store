@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/table"
 import { ProductFilters } from "@/app/components/ProductFilters"
 import { ProductType, Size } from "@/app/lib/constants"
+import Image from "next/image"
 
 interface ProductTableProps {
   products: Product[]
@@ -208,6 +209,7 @@ export function ProductTable({ products: initialProducts, onProductAdded }: Prod
           <Table>
             <TableHeader className="sticky top-0 bg-background border-b">
               <TableRow>
+                <TableHead className="w-[80px]">Image</TableHead>
                 <TableHead className="w-[200px]">Name</TableHead>
                 <TableHead className="w-[100px] text-center">Type</TableHead>
                 <TableHead className="w-[150px] text-center">Sizes</TableHead>
@@ -219,6 +221,18 @@ export function ProductTable({ products: initialProducts, onProductAdded }: Prod
             <TableBody >
               {filteredProducts.map((product) => (
                 <TableRow key={product.id}>
+                  <TableCell>
+                    <div className="relative w-16 h-16 rounded-md overflow-hidden">
+                      <Image
+                        src={product.image || '/placeholder-image.jpg'}
+                        alt={product.name}
+                        key = {product.id+"-table"}
+                        fill
+                        className="object-cover"
+                        sizes="64px"
+                      />
+                    </div>
+                  </TableCell>
                   <TableCell>{product.name}</TableCell>
                   <TableCell className="text-center">
                     <Badge variant="secondary">

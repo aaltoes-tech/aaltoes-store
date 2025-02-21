@@ -10,8 +10,6 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
       where: { id: orderId },
       data: { status }
     })
-    
-    revalidatePath(`/admin/orders/${orderId}`)
     return { success: true }
   } catch (error) {
     console.error('Failed to update order status:', error);
@@ -31,8 +29,6 @@ export async function cancelOrder(orderId: string) {
       where: { id: orderId },
       data: { status: "CANCELLED" }
     })
-    
-    revalidatePath(`/admin/orders/${orderId}`)
     return { success: true }
   } catch (error) {
     console.error('Failed to cancel order:', error);
@@ -46,10 +42,6 @@ export async function completeOrder(orderId: string) {
       where: { id: orderId },
       data: { status: "DELIVERED" }
     })
-    
-    // TODO: Send notification to user
-    
-    revalidatePath(`/admin/orders/${orderId}`)
     return { success: true }
   } catch (error) {
     console.error('Failed to complete order:', error);

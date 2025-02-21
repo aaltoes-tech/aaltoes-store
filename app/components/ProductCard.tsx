@@ -53,6 +53,7 @@ export function ProductCard({ product }: ProductCardProps) {
             className={`object-cover transition-opacity duration-300 ${
               imageLoading ? 'opacity-0' : 'opacity-100'
             }`}
+            key={product.id+"-card"}
             priority
             onError={() => setImageError(true)}
             onLoadingComplete={() => setImageLoading(false)}
