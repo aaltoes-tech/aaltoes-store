@@ -51,18 +51,16 @@ export function ImageCropper({ imageFile, onCrop, onCancel }: ImageCropperProps)
                   minWidth={100}
                   minHeight={100}
                 >
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     ref={imgRef}
                     src={imgSrc}
                     alt="Crop preview"
-                    width={1000}
-                    height={1000}
                     style={{ 
                       maxWidth: '80vw',
                       maxHeight: 'calc(80vh - 8rem)',
                       objectFit: 'contain'
                     }}
-                    unoptimized
                   />
                 </ReactCrop>
               </div>
