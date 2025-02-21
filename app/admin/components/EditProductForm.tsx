@@ -1,10 +1,10 @@
 "use client"
 
-import { Product, Size as PrismaSize, ProductType as PrismaProductType } from "@prisma/client"
+import { Product, Size as PrismaSize} from "@prisma/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { useState, useRef } from "react"
+import { useState } from "react"
 import { PRODUCT_TYPE_CONFIG } from "@/app/lib/constants"
 import { Label } from "@/components/ui/label"
 import { InputFile } from "@/app/components/ui/input-file"

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import ReactCrop, { type Crop } from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
@@ -50,15 +51,18 @@ export function ImageCropper({ imageFile, onCrop, onCancel }: ImageCropperProps)
                   minWidth={100}
                   minHeight={100}
                 >
-                  <img
+                  <Image
                     ref={imgRef}
                     src={imgSrc}
                     alt="Crop preview"
+                    width={1000}
+                    height={1000}
                     style={{ 
                       maxWidth: '80vw',
                       maxHeight: 'calc(80vh - 8rem)',
                       objectFit: 'contain'
                     }}
+                    unoptimized
                   />
                 </ReactCrop>
               </div>

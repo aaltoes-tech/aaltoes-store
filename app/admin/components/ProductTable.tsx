@@ -89,7 +89,7 @@ export function ProductTable({ products: initialProducts, onProductAdded }: Prod
       setFilteredProducts(freshProducts)
       setEditingProduct(null)
       toast({ description: "Product updated successfully" })
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to update product",
