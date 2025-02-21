@@ -61,7 +61,7 @@ export function ProductDetail({ product, isOpen, onClose }: ProductDetailProps) 
               sizes="(max-height: 1000px) 100vw, 50vw"
               priority
               onError={() => setImageError(true)}
-              onLoadingComplete={() => setImageLoading(false)}
+              onLoad={() => setImageLoading(false)}
             />
           </div>
           <div className="flex flex-col space-y-4">

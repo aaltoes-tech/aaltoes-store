@@ -5,6 +5,12 @@ import { prisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
+  theme: {
+    brandColor: "#000000",
+    logo: "/aaltoes.svg",
+    buttonText: "#FFFFFF",
+    colorScheme: "auto"
+  },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -14,6 +20,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     session: async ({ session, user }) => ({
       ...session,
+
       user: {
         ...session.user,
         id: user.id,

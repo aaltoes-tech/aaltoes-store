@@ -31,16 +31,13 @@ export default async function OrderPage() {
     redirect("/")
   }
 
-  const subtotal = await getCartTotal(session.user.id)
-  const shipping = 0
-  const total = subtotal + shipping
+  const total = await getCartTotal(session.user.id)
 
   return (
     <>
       <Navbar />
       <OrderClient 
         session={session}
-        subtotal={subtotal}
         total={total}
       />
     </>

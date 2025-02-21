@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, useRef } from 'react'
-import Image from 'next/image'
 import ReactCrop, { type Crop } from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'

@@ -56,7 +56,7 @@ export function ProductCard({ product }: ProductCardProps) {
             key={product.id+"-card"}
             priority
             onError={() => setImageError(true)}
-            onLoadingComplete={() => setImageLoading(false)}
+            onLoad={() => setImageLoading(false)}
           />
         </div>
         <div className="p-4 flex flex-col flex-1">

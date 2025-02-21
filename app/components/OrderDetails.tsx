@@ -16,10 +16,9 @@ interface OrderDetailsProps {
   order: OrderWithDetails;
   isOpen: boolean
   onClose: () => void
-  revalidate?: () => Promise<void>
 }
 
-export function OrderDetails({ order, isOpen, onClose, revalidate }: OrderDetailsProps) {
+export function OrderDetails({ order, isOpen, onClose}: OrderDetailsProps) {
   if (!order) return null
 
   return (

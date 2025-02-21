@@ -12,7 +12,6 @@ import { Session } from "next-auth"
 
 interface OrderClientProps {
   session: Session;  // from next-auth
-  subtotal: number;
   total: number;
 }
 
@@ -49,7 +48,7 @@ function CustomerDetails({ name, email }: { name: string; email: string }) {
   )
 }
 
-function OrderSummary({ subtotal, total }: { subtotal: number; total: number }) {
+function OrderSummary({total }: {total: number }) {
   return (
     <div className="border-t pt-6">
       <h3 className="text-lg font-semibold tracking-tight mb-4">Order Summary</h3>
@@ -70,7 +69,7 @@ function OrderSummary({ subtotal, total }: { subtotal: number; total: number }) 
 }
 
 // Main Component
-export function OrderClient({ session, subtotal, total }: OrderClientProps) {
+export function OrderClient({ session, total }: OrderClientProps) {
   const router = useRouter()
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
@@ -153,7 +152,7 @@ export function OrderClient({ session, subtotal, total }: OrderClientProps) {
                 </div>
               </div>
 
-              <OrderSummary subtotal={subtotal} total={total} />
+              <OrderSummary total={total} />
 
               <div className="pt-6">
                 <Button 
