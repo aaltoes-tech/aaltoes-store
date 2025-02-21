@@ -75,26 +75,25 @@ export function ProductTable({ products: initialProducts, onProductAdded }: Prod
     }
   }
 
-  async function handleUpdate(id: string, data: Partial<Product>) {
+  async function handleUpdate(id: string, formData: FormData) {
     try {
-      const res = await fetch(`/api/products/${id}`, {
+      const response = await fetch(`/api/products/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: formData
       })
       
-      if (!res.ok) throw new Error()
+      if (!response.ok) throw new Error()
       
       const freshProducts = await onProductAdded()
       setProducts(freshProducts)
       setFilteredProducts(freshProducts)
-      
       setEditingProduct(null)
       toast({ description: "Product updated successfully" })
-    } catch {
-      toast({ 
-        variant: "destructive", 
-        description: "Failed to update product" 
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update product",
+        variant: "destructive"
       })
     }
   }
@@ -314,8 +313,9 @@ export function ProductTable({ products: initialProducts, onProductAdded }: Prod
           {editingProduct && (
             <EditProductForm
               product={editingProduct}
-              onSubmit={(data: Partial<Product>) => handleUpdate(editingProduct.id, data)}
+              onSubmit={(formData: FormData) => handleUpdate(editingProduct.id, formData)}
               onCancel={() => setEditingProduct(null)}
+              onSuccess={() => setEditingProduct(null)}
             />
           )}
         </DialogContent>

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import ReactCrop, { type Crop } from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 
 interface ImageCropperProps {
@@ -36,6 +36,9 @@ export function ImageCropper({ imageFile, onCrop, onCancel }: ImageCropperProps)
       <DialogContent className="sm:max-w-[80vw] h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Select Image Area</DialogTitle>
+          <DialogDescription>
+            Select the area of the image you want to use. If you want to use the whole image, just press cancel.
+          </DialogDescription>
         </DialogHeader>
         <div className="flex-1 overflow-hidden p-4">
           {imgSrc && (

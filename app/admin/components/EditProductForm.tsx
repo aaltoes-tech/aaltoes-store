@@ -4,36 +4,57 @@ import { Product, Size as PrismaSize, ProductType as PrismaProductType } from "@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { PRODUCT_TYPE_CONFIG } from "@/app/lib/constants"
 import { Label } from "@/components/ui/label"
+import { InputFile } from "@/app/components/ui/input-file"
+import { type Crop } from 'react-image-crop'
+import { useToast } from "@/hooks/use-toast"
 
 interface EditProductFormProps {
   product: Product
-  onSubmit: (data: Partial<Product>) => Promise<void>
+  onSubmit: (formData: FormData) => Promise<void>
   onCancel: () => void
+  onSuccess: () => void
 }
 
-export function EditProductForm({ product, onSubmit, onCancel }: EditProductFormProps) {
+export function EditProductForm({ product, onSubmit, onCancel, onSuccess }: EditProductFormProps) {
+
   const [loading, setLoading] = useState(false)
   const [sizes, setSizes] = useState<PrismaSize[]>(product.sizes || [])
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [cropData, setCropData] = useState<Crop | null>(null)
+  const { toast } = useToast()
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setLoading(true)
 
     const formData = new FormData(e.currentTarget)
-    const data = {
-      name: formData.get("name") as string,
-      price: parseFloat(formData.get("price") as string),
-      description: formData.get("description") as string,
-      image: formData.get("image") as string,
-      type: formData.get("type") as PrismaProductType,
-      sizes: sizes,
+    formData.append('type', product.type)
+    if (imageFile) {
+      formData.append('file', imageFile)
     }
+    if (cropData) {
+      formData.append('cropData', JSON.stringify(cropData))
+    }
+    formData.append('sizes', JSON.stringify(sizes))
 
     try {
-      await onSubmit(data)
+      await onSubmit(formData)
+      toast({
+        title: "Success",
+        description: "Product updated successfully",
+      })
+      onSuccess()
+      onCancel()
+    } catch (error) {
+      console.error(error)
+      toast({
+        title: "Error",
+        description: "Failed to update product",
+        variant: "destructive",
+      })
     } finally {
       setLoading(false)
     }
@@ -103,6 +124,13 @@ export function EditProductForm({ product, onSubmit, onCancel }: EditProductForm
           </div>
         )}
       </div>
+
+      <InputFile
+        onChange={(file, crop) => {
+          setImageFile(file)
+          setCropData(crop || null)
+        }}
+      />
 
       <div className="flex justify-end gap-2">
         <Button type="button" variant="outline" onClick={onCancel}>
