@@ -30,13 +30,11 @@ export function ProductCard({ product }: ProductCardProps) {
     ? product.image 
     : '/placeholder-image.jpg'
 
-  console.log(product)
-
   return (
     <>
-      <div className="bg-background rounded-lg border shadow-sm overflow-hidden flex flex-col h-[380px]">
+      <div className="group bg-background rounded-lg border shadow-sm overflow-hidden flex flex-col">
         <div 
-          className="relative w-full aspect-square shrink-0 cursor-pointer"
+          className="relative aspect-square w-full cursor-pointer overflow-hidden"
           onClick={() => setShowDetail(true)}
         >
           {/* Loading Spinner */}
@@ -47,20 +45,22 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
           
           <Image
-            src={imageError ? '/placeholder-image.jpg' : imageUrl + "?img-height=1000&img-format=webp"}
+            src={imageError ? '/placeholder-image.jpg' : imageUrl + "?img-height=400&img-format=webp"}
             alt={product.name}
             fill
-            className={`object-cover transition-opacity duration-300 ${
+            className={`object-cover transition-all duration-300 ${
               imageLoading ? 'opacity-0' : 'opacity-100'
-            }`}
-            key={product.id+"-card"}
-            priority
+            } group-hover:scale-105`}
+            sizes="(max-width: 400px) 250px, (max-width: 768px) 350px, (max-width: 1024px) 400px, 450px"
+            quality={75}
+            priority={false}
             onError={() => setImageError(true)}
             onLoad={() => setImageLoading(false)}
           />
         </div>
         <div className="p-4 flex flex-col flex-1">
-          <h3 className="text-lg font-semibold truncate">{product.name}</h3>
+          <h3 className="font-semibold text-base sm:text-lg line-clamp-2">{product.name}</h3>
+          <p className="mt-2 text-lg font-bold">{product.price} €</p>
         
           <div className="flex flex-wrap gap-1 mt-2">
             {needsSize ? (
@@ -75,13 +75,16 @@ export function ProductCard({ product }: ProductCardProps) {
               ))
             ) : null}
           </div>
-          <div className="flex-1" />
-          <Button 
-            variant="outline"
-            onClick={() => setShowDetail(true)}
-          >
-            View Details
-          </Button>
+
+          <div className="mt-auto pt-4">
+            <Button 
+              variant="outline"
+              className="w-full"
+              onClick={() => setShowDetail(true)}
+            >
+              View Details
+            </Button>
+          </div>
         </div>
       </div>
 

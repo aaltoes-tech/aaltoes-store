@@ -21,7 +21,6 @@ export async function PUT(req: Request, { params }: RouteParams) {
 
   const data = await req.json()
 
-  console.log(data)
   
   if (data.status === ProductStatus.removed) {
     try {

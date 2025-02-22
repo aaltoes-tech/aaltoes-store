@@ -73,6 +73,7 @@ export function ProductGrid({ products }: ProductGridProps) {
         currentType={typeFilter}
         currentSize={sizeFilter}
       />
+
       {filteredProducts.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-lg font-medium text-muted-foreground">
@@ -83,7 +84,7 @@ export function ProductGrid({ products }: ProductGridProps) {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 min-[400px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
           {filteredProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

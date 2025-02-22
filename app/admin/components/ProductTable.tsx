@@ -60,8 +60,6 @@ export function ProductTable({ products: initialProducts, onProductAdded }: Prod
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: ProductStatus.removed })
       })
-
-      console.log(res)
       
       if (!res.ok) throw new Error()
       

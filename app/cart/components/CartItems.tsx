@@ -99,7 +99,7 @@ export function CartItems({ items: initialItems }: CartItemsProps) {
   const total = items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0)
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col min-h-[400px]">
       <div className="flex-1 max-h-[400px] overflow-auto">
         <table className="w-full border-collapse">
           <thead className="sticky top-0  bg-background z-10">
@@ -189,21 +189,22 @@ export function CartItems({ items: initialItems }: CartItemsProps) {
       </div>
 
       <div className="p-6 bg-muted/50 shrink-0">
-        <div className="flex justify-between items-center max-w-4xl mx-auto">
-          <div className="text-lg font-medium flex items-center gap-2">
-            <span>Total:</span>
-            <span>{total.toFixed(2)} €</span>
+        <div className="max-w-4xl mx-auto space-y-4">
+          <div className="flex justify-end">
+            <div className="text-right">
+              <p className="text-sm text-muted-foreground">Total Amount</p>
+              <p className="text-2xl font-bold">{total.toFixed(2)} €</p>
+            </div>
           </div>
-          <div className="w-[200px]">
-            <Button 
-              className="w-full" 
-              size="lg"
-              onClick={handleCheckout}
-              disabled={hasRemovedProducts}
-            >
-              Proceed to Checkout
-            </Button>
-          </div>
+          
+          <Button 
+            className="w-full sm:w-auto sm:min-w-[200px] ml-auto block" 
+            size="lg"
+            onClick={handleCheckout}
+            disabled={hasRemovedProducts}
+          >
+            Proceed to Checkout
+          </Button>
         </div>
       </div>
     </div>
