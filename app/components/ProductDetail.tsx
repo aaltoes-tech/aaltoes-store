@@ -39,7 +39,7 @@ export function ProductDetail({ product, isOpen, onClose }: ProductDetailProps) 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[1000px]">
+      <DialogContent className="sm:max-w-[1000px] max-h-[85vh] md:max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">{product.name}</DialogTitle>
         </DialogHeader>
