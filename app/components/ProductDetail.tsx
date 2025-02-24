@@ -24,7 +24,6 @@ interface ProductDetailProps {
 export function ProductDetail({ product, isOpen, onClose }: ProductDetailProps) {
   const [selectedSize, setSelectedSize] = useState<Size | "">("")
   const [imageError, setImageError] = useState(false)
-  const [imageLoading, setImageLoading] = useState(true)
   const needsSize = PRODUCT_TYPE_CONFIG[product.type]?.hasSize
 
   const imageUrl = product.image && 
