@@ -17,14 +17,43 @@ export async function PATCH(
   try {
     const { quantity } = await req.json()
 
-    const cartItem = await prisma.cartItem.update({
-      where: { id },
-      data: { quantity }
+    // Validate quantity
+    if (quantity < 1 || quantity > 10) {
+      return NextResponse.json({ error: "Invalid quantity" }, { status: 400 })
+    }
+
+    // Update quantity in a single optimized query
+    const cartItem = await prisma.$transaction(async (tx) => {
+      // Verify cart ownership and update in one query
+      const item = await tx.cartItem.findFirst({
+        where: {
+          id,
+          cart: {
+            user_id: session.user.id
+          }
+        }
+      })
+
+      if (!item) {
+        throw new Error("Item not found")
+      }
+
+      return tx.cartItem.update({
+        where: { id },
+        data: { quantity },
+        select: {
+          id: true,
+          quantity: true
+        }
+      })
     })
 
     return NextResponse.json(cartItem)
   } catch (error) {
     console.error('Cart update error:', error)
+    if (error instanceof Error && error.message === "Item not found") {
+      return NextResponse.json({ error: "Item not found" }, { status: 404 })
+    }
     return NextResponse.json(
       { error: "Failed to update cart" },
       { status: 500 }

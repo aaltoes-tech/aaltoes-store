@@ -11,6 +11,7 @@ import Link from "next/link"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { ProductStatus, Size } from "@prisma/client"
+import Loading from "@/app/cart/loading"
 
 // Add the missing types
 interface CartItem {
@@ -46,12 +47,22 @@ interface CartItemWithProduct extends Omit<CartItem, 'product' | 'size'> {
   size: Size | null;
 }
 
+// Add caching and optimization configs
+export const revalidate = 10 // Revalidate every 10 seconds
+export const dynamic = 'force-dynamic'
+export const preferredRegion = 'fra1'
+
 async function getCartItems(userId: string) {
+  // Optimize query with selective fields
   const cart = await prisma.cart.findFirst({
     where: { user_id: userId },
-    include: {
+    select: {
+      id: true,
       items: {
-        include: {
+        select: {
+          id: true,
+          quantity: true,
+          size: true,
           product: {
             select: {
               id: true,
@@ -67,13 +78,14 @@ async function getCartItems(userId: string) {
     }
   })
 
-  // Transform items and calculate total
-  return (cart?.items || []).map(item => ({
+  if (!cart?.items.length) {
+    return []
+  }
+
+  // Calculate totals on server
+  return cart.items.map(item => ({
     ...item,
-    total: item.quantity * item.product.price,
-    product: {
-      ...item.product
-    }
+    total: item.quantity * item.product.price
   }))
 }
 
@@ -100,49 +112,45 @@ export default async function CartPage() {
     redirect("/")
   }
 
-  const cartItems = transformCartItems(await getCartItems(session.user.id))
+  const cartItems = await getCartItems(session.user.id)
 
   return (
     <>
       <Navbar />
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="flex  justify-between mb-8">
-          <h1 className="text-3xl font-bold tracking-tight ml-auto mr-auto">Cart</h1>
-        </div>
-        <div className="flex justify-between mb-8">
-          <Link
-            href="/"
-            className={cn(
-              buttonVariants({ variant: "ghost" }),
-              "text-muted-foreground"
-            )}
-          >
-            <ArrowLeft size={16} className="mr-2" />
-            Back to Store
-          </Link>
-        </div>
-        <div className="bg-card rounded-lg border shadow-sm">
-          <Suspense fallback={
-            <div className="p-8 text-center text-muted-foreground">
-              Loading your cart...
-            </div>
-          }>
-            <CartItems items={cartItems} />
-          </Suspense>
-        </div>
-
-        <div className="text-sm text-muted-foreground text-center mt-6">
-          <p>
-            Need help?{" "}
-            <a 
-              href="mailto:board@aaltoes.com?subject=Aaltoes%20Store%20Support%20Request" 
-              className="text-primary hover:underline"
+      <Suspense fallback={<Loading />}>
+        <main className="container mx-auto px-4 py-8 max-w-4xl">
+          <div className="flex justify-center mb-8">
+            <h1 className="text-3xl font-bold tracking-tight">Cart</h1>
+          </div>
+          <div className="flex justify-between mb-8">
+            <Link
+              href="/"
+              className={cn(
+                buttonVariants({ variant: "ghost" }),
+                "text-muted-foreground"
+              )}
             >
-              Contact us at board@aaltoes.com
-            </a>
-          </p>
-        </div>
-      </main>
+              <ArrowLeft size={16} className="mr-2" />
+              Back to Store
+            </Link>
+          </div>
+          <div className="bg-card rounded-lg border shadow-sm">
+            <CartItems items={cartItems} />
+          </div>
+
+          <div className="text-sm text-muted-foreground text-center mt-6">
+            <p>
+              Need help?{" "}
+              <a 
+                href="mailto:board@aaltoes.com?subject=Aaltoes%20Store%20Support%20Request" 
+                className="text-primary hover:underline"
+              >
+                Contact us at board@aaltoes.com
+              </a>
+            </p>
+          </div>
+        </main>
+      </Suspense>
     </>
   )
 } 

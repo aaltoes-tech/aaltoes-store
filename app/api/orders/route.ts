@@ -2,7 +2,6 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
 import { authOptions } from "@/lib/auth"
-import { Prisma } from "@prisma/client"
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
@@ -12,59 +11,75 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { phone, comment } = await req.json()
+    const { phone, comment, total } = await req.json()
 
-    const cart = await prisma.cart.findFirst({
-      where: { user_id: session.user.id },
-      include: {
-        items: {
-          include: {
-            product: true
+    // Use a transaction to ensure data consistency and optimize performance
+    const order = await prisma.$transaction(async (tx) => {
+      // Get cart items in a single query with all needed data
+      const cart = await tx.cart.findFirst({
+        where: { user_id: session.user.id },
+        include: {
+          items: {
+            include: {
+              product: {
+                select: {
+                  id: true,
+                  price: true,
+                  status: true
+                }
+              }
+            }
           }
         }
+      })
+
+      if (!cart?.items.length) {
+        throw new Error("Cart is empty")
       }
-    })
 
-    if (!cart || cart.items.length === 0) {
-      return NextResponse.json({ error: "Cart is empty" }, { status: 400 })
-    }
-
-    const total = cart.items.reduce((sum, item) => 
-      sum + (item.product.price * item.quantity), 0
-    )
-
-    const orderData: Prisma.OrderCreateInput = {
-      user: {
-        connect: { id: session.user.id }
-      },
-      phone_number: phone || "",
-      comment: comment || "",
-      total,
-      items: {
-        create: cart.items.map(item => ({
-          product: { connect: { id: item.productId } },
-          quantity: item.quantity,
-          total: item.product.price * item.quantity,
-          size: item.size
-        }))
+      // Verify all products are available
+      const unavailableProduct = cart.items.find(
+        item => item.product.status === 'removed'
+      )
+      if (unavailableProduct) {
+        throw new Error("Some products are no longer available")
       }
-    }
 
-    const order = await prisma.order.create({
-      data: orderData,
-      include: {
-        items: true
-      }
-    })
+      // Create order with items in a single transaction
+      const order = await tx.order.create({
+        data: {
+          user_id: session.user.id,
+          total,
+          phone_number: phone || "",
+          comment: comment || "",
+          items: {
+            create: cart.items.map(item => ({
+              productId: item.productId,
+              quantity: item.quantity,
+              size: item.size,
+              total: item.quantity * item.product.price
+            }))
+          }
+        }
+      })
 
-    // Clear cart
-    await prisma.cartItem.deleteMany({
-      where: { cartId: cart.id }
+      // Delete cart items in bulk
+      await tx.cartItem.deleteMany({
+        where: { cartId: cart.id }
+      })
+
+      return order
     })
 
     return NextResponse.json(order)
   } catch (error) {
     console.error('Order creation error:', error)
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.message === "Cart is empty" ? 400 : 500 }
+      )
+    }
     return NextResponse.json(
       { error: "Failed to create order" },
       { status: 500 }
