@@ -1,0 +1,1 @@
+export const truncateId = (id: string) => id.length > 8 ? `${id.substring(0, 8)}...` : id; 

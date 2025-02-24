@@ -92,23 +92,27 @@ export async function POST(req: Request) {
 const TIMEOUT = 5000 // 5 seconds
 
 export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url)
+  const page = parseInt(searchParams.get('page') || '1')
+  const limit = parseInt(searchParams.get('limit') || '5')
+  const skip = (page - 1) * limit
+
   try {
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), TIMEOUT)
+    const products = await prisma.product.findMany({
+      skip,
+      take: limit,
+      orderBy: {
+        createdAt: 'desc'
+      }
+    })
 
-    const products = await Promise.race([
-      prisma.product.findMany(),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout')), TIMEOUT)
-      )
-    ])
+    const total = await prisma.product.count()
 
-    clearTimeout(timeoutId)
-    return Response.json(products)
-  } catch (error: unknown) {
-    if (error instanceof Error && error.name === 'AbortError') {
-      return Response.json({ error: "Request timeout" }, { status: 408 })
-    }
+    return Response.json({
+      products,
+      hasMore: skip + limit < total
+    })
+  } catch (error) {
     return Response.json({ error: "Failed to fetch products" }, { status: 500 })
   }
 } 

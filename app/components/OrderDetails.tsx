@@ -11,6 +11,8 @@ import { PRODUCT_TYPE_CONFIG, ProductType } from "@/app/lib/constants"
 import { formatDate } from "@/lib/utils"
 import { OrderWithDetails } from "@/app/types"
 import { OrderItem, Product } from "@prisma/client"
+import { useState } from "react"
+import Image from "next/image"
 
 interface OrderDetailsProps {
   order: OrderWithDetails;
@@ -19,6 +21,19 @@ interface OrderDetailsProps {
 }
 
 export function OrderDetails({ order, isOpen, onClose}: OrderDetailsProps) {
+  const [imageError, setImageError] = useState<Record<string, boolean>>({})
+
+  const getImageUrl = (productImage: string) => {
+    if (imageError[productImage]) {
+      return '/placeholder-image.jpg'
+    }
+    try {
+      return new URL(productImage).toString()
+    } catch {
+      return '/placeholder-image.jpg'
+    }
+  }
+
   if (!order) return null
 
   return (
@@ -47,17 +62,32 @@ export function OrderDetails({ order, isOpen, onClose}: OrderDetailsProps) {
                   key={item.id} 
                   className="flex items-start justify-between p-3 border rounded-lg"
                 >
-                  <div>
-                    <p className="font-medium">{item.product.name}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge variant="secondary">
-                        {PRODUCT_TYPE_CONFIG[item.product.type as ProductType].label}
-                      </Badge>
-                      {item.size && (
-                        <Badge variant="outline">
-                          {item.size}
+                  <div className="flex gap-3">
+                    <Image
+                      src={getImageUrl(item.product.image)}
+                      alt={item.product.name}
+                      width={48}
+                      height={48}
+                      className="rounded-md object-cover"
+                      onError={() => {
+                        setImageError(prev => ({
+                          ...prev,
+                          [item.product.image]: true
+                        }))
+                      }}
+                    />
+                    <div>
+                      <p className="font-medium">{item.product.name}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="secondary">
+                          {PRODUCT_TYPE_CONFIG[item.product.type as ProductType].label}
                         </Badge>
-                      )}
+                        {item.size && (
+                          <Badge variant="outline">
+                            {item.size}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="text-right">

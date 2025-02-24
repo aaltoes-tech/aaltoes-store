@@ -8,6 +8,10 @@ import { formatDate } from "@/lib/utils"
 import { Product } from "@prisma/client"
 import Image from "next/image"
 import { OrderStatusFilter } from "./OrderStatusFilter"
+import { truncateId } from "@/app/utils/utils"
+import { Copy, Mail } from "@geist-ui/icons"
+import { cn } from "@/lib/utils"
+import { buttonVariants } from "@/components/ui/button"
 
 interface OrderItem {
   id: string
@@ -82,6 +86,26 @@ export function OrderList({ initialOrders }: OrderListProps) {
       : '/placeholder-image.jpg'
   }
 
+  const handleCopyId = async (id: string) => {
+    try {
+      await navigator.clipboard.writeText(id)
+      toast({
+        description: "Order ID copied to clipboard"
+      })
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        description: "Failed to copy order ID"
+      })
+    }
+  }
+
+  const getContactEmailUrl = (orderId: string) => {
+    const subject = `Aaltoes Shop: Support Request for Order #${orderId}`
+    const email = "board@aaltoes.com"
+    return `mailto:${email}?subject=${encodeURIComponent(subject)}`
+  }
+
   return (
     <div className="space-y-8">
       <OrderStatusFilter
@@ -104,88 +128,69 @@ export function OrderList({ initialOrders }: OrderListProps) {
                 <p className="text-sm text-muted-foreground">
                   Placed on {formatDate(order.createdAt)}
                 </p>
-                <p className="font-medium">
-                  Order #{order.id.slice(-8).toUpperCase()}
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <Badge variant="outline" className="capitalize">
-                  {order.status.toLowerCase()}
-                </Badge>
-                {order.status === "PENDING" && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    className="text-muted-foreground hover:text-destructive"
-                    disabled={loading}
-                    onClick={() => cancelOrder(order.id)}
+                <div className="flex items-center gap-2">
+                  <p className="font-medium">
+                    Order #{truncateId(order.id)}
+                  </p>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={() => handleCopyId(order.id)}
                   >
-                    {loading ? "Cancelling..." : "Cancel"}
+                    <Copy className="h-4 w-4" />
                   </Button>
-                )}
+                </div>
               </div>
+              <Badge variant="outline" className="capitalize">
+                {order.status.toLowerCase()}
+              </Badge>
             </div>
 
             <div className="space-y-4">
-              {order.items.length === 0 || order.status !== "CANCELLED" && (
-                <>
-                  {order.items.map((item) => (
-                    <div key={item.id} className="py-4 flex gap-4 items-center">
-                      <div className="relative w-20 h-20 flex-shrink-0">
-                        {imageLoading && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-muted/10">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-                          </div>
-                        )}
-                        <Image
-                          src={imageError ? '/placeholder-image.jpg' : getImageUrl(item.product.image)}
-                          alt={item.product.name}
-                          fill
-                          className={`object-cover rounded-md transition-opacity duration-300 ${
-                            imageLoading ? 'opacity-0' : 'opacity-100'
-                          }`}
-                          sizes="80px"
-                          priority
-                          onError={() => setImageError(true)}
-                          onLoadingComplete={() => setImageLoading(false)}
-                        />
-                      </div>
-                      <div className="flex-1 space-y-1">
-                        <p className="font-medium">{item.product.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Qty: {item.quantity}
-                          {item.size && ` • ${item.size}`}
-                        </p>
-                      </div>
-                      <p className="font-medium">{item.total.toFixed(2)} €</p>
-                    </div>
-                  ))}
-                </>
-              )}
+              {order.items.map((item) => (
+                <div key={item.id} className="py-4 flex gap-4 items-center">
+                  <div className="relative w-20 h-20 flex-shrink-0">
+                    <Image
+                      src={getImageUrl(item.product.image)}
+                      alt={item.product.name}
+                      fill
+                      className="object-cover rounded-md"
+                      onError={() => setImageError(true)}
+                    />
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <p className="font-medium">{item.product.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Qty: {item.quantity}
+                      {item.size && ` • ${item.size}`}
+                    </p>
+                  </div>
+                  <p className="font-medium">{item.total.toFixed(2)} €</p>
+                </div>
+              ))}
             </div>
 
-            <div className="flex justify-between items-start">
-              <div className="space-y-1">
-                {(order.phone_number || order.comment) && (
-                  <div className="text-sm text-muted-foreground space-y-1">
-                    {order.phone_number && (
-                      <p>Contact: {order.phone_number}</p>
-                    )}
-                    {order.comment && (
-                      <p>Note: {order.comment}</p>
-                    )}
-                  </div>
-                )}
-              </div>
-              {order.status !== "CANCELLED" && (
+            {order.status !== "CANCELLED" && (
+              <div className="flex justify-between items-center pt-4 border-t">
+                <a
+                  href={getContactEmailUrl(order.id)}
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "sm" }),
+                    "gap-2"
+                  )}
+                >
+                  <Mail className="h-4 w-4" />
+                  Contact Support
+                </a>
                 <div className="text-right">
                   <p className="text-sm font-medium">Total Amount</p>
                   <p className="text-2xl font-bold tracking-tight">
                     {order.total.toFixed(2)} €
                   </p>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         ))
       )}

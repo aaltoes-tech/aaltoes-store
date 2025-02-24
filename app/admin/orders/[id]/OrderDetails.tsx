@@ -4,12 +4,15 @@ import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/lib/utils"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowLeft } from "@geist-ui/icons"
+import { ArrowLeft, Copy } from "@geist-ui/icons"
 import { OrderActions } from "./OrderActions"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Product } from "@prisma/client"
 import { useState } from "react"
+import { useToast } from "@/hooks/use-toast"
+import { Button } from "@/components/ui/button"
+import { truncateId } from "@/app/utils/utils"
 
 interface OrderItem {
   id: string
@@ -36,7 +39,33 @@ interface OrderDetailsProps {
 }
 
 export function OrderDetails({ order }: OrderDetailsProps) {
-  const [imageError, setImageError] = useState(false)
+  const { toast } = useToast()
+  const [imageError, setImageError] = useState<Record<string, boolean>>({})
+
+  const handleCopyId = async () => {
+    try {
+      await navigator.clipboard.writeText(order.id)
+      toast({
+        description: "Order ID copied to clipboard"
+      })
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        description: "Failed to copy order ID"
+      })
+    }
+  }
+
+  const getImageUrl = (productImage: string) => {
+    if (imageError[productImage]) {
+      return '/placeholder-image.jpg'
+    }
+    try {
+      return new URL(productImage).toString()
+    } catch {
+      return '/placeholder-image.jpg'
+    }
+  }
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-4xl">
@@ -56,7 +85,19 @@ export function OrderDetails({ order }: OrderDetailsProps) {
 
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Order #{order.id}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-bold tracking-tight">
+                Order #{truncateId(order.id)}
+              </h1>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={handleCopyId}
+              >
+                <Copy className="h-5 w-5" />
+              </Button>
+            </div>
             <p className="text-muted-foreground mt-2">
               Created on {formatDate(order.createdAt)}
             </p>
@@ -104,19 +145,21 @@ export function OrderDetails({ order }: OrderDetailsProps) {
               {order.items.map((item) => (
                 <div 
                   key={item.id}
-                  className="flex gap-4 p-4 border rounded-lg"
+                  className="flex items-start gap-4 p-4 border rounded-lg"
                 >
-                  <div className="relative w-20 h-20">
-                    <Image
-                      src={imageError ? '/placeholder-image.jpg' : item.product.image+"?img-width=800&img-format=webp"}
-                      alt={item.product.name}
-                      fill
-                      className="object-cover rounded-md"
-                      sizes="80px"
-                      priority
-                      onError={() => setImageError(true)}
-                    />
-                  </div>
+                  <Image
+                    src={getImageUrl(item.product.image)}
+                    alt={item.product.name}
+                    width={80}
+                    height={80}
+                    className="rounded-lg object-cover"
+                    onError={() => {
+                      setImageError(prev => ({
+                        ...prev,
+                        [item.product.image]: true
+                      }))
+                    }}
+                  />
                   <div className="flex-1">
                     <div className="flex justify-between">
                       <div>
