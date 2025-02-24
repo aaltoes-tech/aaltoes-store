@@ -7,6 +7,11 @@ import { pinata } from "@/app/utils/config"
 import sharp from 'sharp'
 import { type Crop } from 'react-image-crop'
 
+export const runtime = 'edge'
+export const preferredRegion = 'fra1'
+export const revalidate = 3600
+export const dynamic = 'force-dynamic'
+
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
 
@@ -81,5 +86,29 @@ export async function POST(req: Request) {
       { error: "Failed to create product" },
       { status: 500 }
     )
+  }
+}
+
+const TIMEOUT = 5000 // 5 seconds
+
+export async function GET(req: Request) {
+  try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), TIMEOUT)
+
+    const products = await Promise.race([
+      prisma.product.findMany(),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout')), TIMEOUT)
+      )
+    ])
+
+    clearTimeout(timeoutId)
+    return Response.json(products)
+  } catch (error: unknown) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      return Response.json({ error: "Request timeout" }, { status: 408 })
+    }
+    return Response.json({ error: "Failed to fetch products" }, { status: 500 })
   }
 } 
