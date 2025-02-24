@@ -1,6 +1,5 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import {
   Select,
   SelectContent,
@@ -11,6 +10,8 @@ import {
 import { ProductType, Size, PRODUCT_TYPE_CONFIG } from "@/app/lib/constants"
 import { ArrowUp, ArrowDown } from "@geist-ui/icons"
 import { ProductSearch } from "./ProductSearch"
+import { Button } from "@/components/ui/button"
+import { useState } from "react"
 
 interface ProductFiltersProps {
   onSearchChange: (value: string) => void
@@ -31,15 +32,33 @@ export function ProductFilters({
   currentType,
   currentSize,
 }: ProductFiltersProps) {
+  const [searchValue, setSearchValue] = useState("")
+
+  const handleReset = () => {
+    setSearchValue("")
+    onReset()
+  }
+
+  const handleSearchChange = (value: string) => {
+    setSearchValue(value)
+    onSearchChange(value)
+  }
+
   return (
     <div className="mb-8 space-y-4">
-      <ProductSearch onSearchChange={onSearchChange} />
-      <div className="flex flex-wrap items-center gap-4">
+      <div className="w-full">
+        <ProductSearch 
+          value={searchValue}
+          onSearchChange={handleSearchChange} 
+        />
+      </div>
+      
+      <div className="flex flex-wrap items-center gap-2">
         <Select 
           value={currentType} 
           onValueChange={(value) => onTypeChange(value as ProductType | "all" | "")}
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[140px] sm:w-[180px]">
             <SelectValue placeholder="Product Type" />
           </SelectTrigger>
           <SelectContent>
@@ -56,7 +75,7 @@ export function ProductFilters({
           value={currentSize} 
           onValueChange={(value) => onSizeChange(value as Size | "all" | "")}
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[120px] sm:w-[180px]">
             <SelectValue placeholder="Size" />
           </SelectTrigger>
           <SelectContent>
@@ -69,34 +88,34 @@ export function ProductFilters({
           </SelectContent>
         </Select>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 ml-auto">
           <Button
             variant="outline"
             size="icon"
             onClick={() => onSortChange("asc")}
-            className="w-10 h-10"
+            className="w-8 h-8 sm:w-10 sm:h-10"
           >
-            <ArrowUp size={16} />
+            <ArrowUp size={14} className="sm:size-16" />
           </Button>
           <Button
             variant="outline"
             size="icon"
             onClick={() => onSortChange("desc")}
-            className="w-10 h-10"
+            className="w-8 h-8 sm:w-10 sm:h-10"
           >
-            <ArrowDown size={16} />
+            <ArrowDown size={14} className="sm:size-16" />
+          </Button>
+
+          <Button
+            variant="outline" 
+            onClick={handleReset}
+            className="text-sm sm:text-base h-8 sm:h-10"
+            size="sm"
+          >
+            Reset
           </Button>
         </div>
-
-        <Button 
-          variant="outline" 
-          onClick={onReset}
-          className="ml-auto"
-        >
-          Reset Filters
-        </Button>
       </div>
-
     </div>
   )
 } 
