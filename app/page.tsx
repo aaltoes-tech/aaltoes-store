@@ -28,11 +28,6 @@ export default async function Home() {
         </div>
         
         <ProductGrid products={products} />
-
-        <div className="text-sm text-muted-foreground text-center mt-6 space-y-1 italic">
-          <p>Note: Prices shown are placeholder values and will be determined at launch.</p>
-          <p>Images do not represent final products.</p>
-        </div>
       </main>
     </>
   )

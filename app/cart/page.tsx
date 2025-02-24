@@ -132,7 +132,15 @@ export default async function CartPage() {
         </div>
 
         <div className="text-sm text-muted-foreground text-center mt-6">
-          <p>Need help? Contact us at support@aaltoes.fi</p>
+          <p>
+            Need help?{" "}
+            <a 
+              href="mailto:board@aaltoes.com?subject=Aaltoes%20Store%20Support%20Request" 
+              className="text-primary hover:underline"
+            >
+              Contact us at board@aaltoes.com
+            </a>
+          </p>
         </div>
       </main>
     </>
