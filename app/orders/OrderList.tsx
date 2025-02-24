@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { formatDate } from "@/lib/utils"
-import { Product } from "@prisma/client"
+import { ProductStatus, ProductType } from "@prisma/client"
 import Image from "next/image"
 import { OrderStatusFilter } from "./OrderStatusFilter"
 import { truncateId } from "@/app/utils/utils"
@@ -18,15 +18,22 @@ interface OrderItem {
   quantity: number
   total: number
   size: string | null
-  product: Product
+  product: {
+    id: string
+    name: string
+    price: number
+    image: string
+    type: ProductType
+    status: ProductStatus
+  }
 }
 
 interface Order {
   id: string
   status: string
   createdAt: Date
-  phone_number: string
-  comment: string
+  phone_number?: string
+  comment?: string
   total: number
   items: OrderItem[]
 }
@@ -43,8 +50,7 @@ export function OrderList({ initialOrders }: OrderListProps) {
     "PROCESSING"
   ])
   const { toast } = useToast()
-  const [imageError, setImageError] = useState(false)
-  const [imageLoading, setImageLoading] = useState(true)
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({})
 
   async function cancelOrder(orderId: string) {
     setLoading(true)
@@ -80,10 +86,17 @@ export function OrderList({ initialOrders }: OrderListProps) {
     ? []
     : orders.filter(order => selectedStatuses.includes(order.status))
 
-  const getImageUrl = (url: string) => {
-    return url && (url.startsWith('http') || url.startsWith('/'))
-      ? url+"?img-width=100&img-format=webp"
-      : '/placeholder-image.jpg'
+  const getImageUrl = (productImage: string) => {
+    if (imageErrors[productImage]) {
+      return '/placeholder-image.jpg'
+    }
+    
+    // Check if URL is valid
+    if (!productImage || !(productImage.startsWith('http') || productImage.startsWith('/'))) {
+      return '/placeholder-image.jpg'
+    }
+
+    return productImage + "?img-width=100&img-format=webp"
   }
 
   const handleCopyId = async (id: string) => {
@@ -95,7 +108,7 @@ export function OrderList({ initialOrders }: OrderListProps) {
     } catch (error) {
       toast({
         variant: "destructive",
-        description: "Failed to copy order ID"
+        description: error instanceof Error ? error.message : "Failed to copy order ID"
       })
     }
   }
@@ -142,9 +155,22 @@ export function OrderList({ initialOrders }: OrderListProps) {
                   </Button>
                 </div>
               </div>
-              <Badge variant="outline" className="capitalize">
-                {order.status.toLowerCase()}
-              </Badge>
+              <div className="flex items-center gap-3">
+                <Badge variant="outline" className="capitalize">
+                  {order.status.toLowerCase()}
+                </Badge>
+                {order.status === "PENDING" && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="text-muted-foreground hover:text-destructive"
+                    disabled={loading}
+                    onClick={() => cancelOrder(order.id)}
+                  >
+                    {loading ? "Cancelling..." : "Cancel"}
+                  </Button>
+                )}
+              </div>
             </div>
 
             <div className="space-y-4">
@@ -156,7 +182,12 @@ export function OrderList({ initialOrders }: OrderListProps) {
                       alt={item.product.name}
                       fill
                       className="object-cover rounded-md"
-                      onError={() => setImageError(true)}
+                      onError={() => {
+                        setImageErrors(prev => ({
+                          ...prev,
+                          [item.product.image]: true
+                        }))
+                      }}
                     />
                   </div>
                   <div className="flex-1 space-y-1">

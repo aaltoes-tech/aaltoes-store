@@ -30,15 +30,18 @@ export function CartItems({ items: initialItems }: CartItemsProps) {
   const [items, setItems] = useState(initialItems)
   const { toast } = useToast()
   const router = useRouter()
-  const [imageError, setImageError] = useState(false)
-  const [imageLoading, setImageLoading] = useState(true)
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({})
 
   const hasRemovedProducts = items.some(item => item.product.status === 'removed')
 
-  const getImageUrl = (url: string) => {
-    return url && (url.startsWith('https') || url.startsWith('/'))
-      ? url + "?img-width=100&img-format=webp"
-      : '/placeholder-image.jpg'
+  const getImageUrl = (productImage: string) => {
+    if (imageErrors[productImage]) {
+      return '/placeholder-image.jpg'
+    }
+    if (!productImage || !(productImage.startsWith('http') || productImage.startsWith('/'))) {
+      return '/placeholder-image.jpg'
+    }
+    return productImage + "?img-width=100&img-format=webp"
   }
 
   async function updateQuantity(itemId: string, newQuantity: number) {
@@ -117,23 +120,17 @@ export function CartItems({ items: initialItems }: CartItemsProps) {
               <tr key={item.id} className="hover:bg-muted/50 transition-colors">
                 <td className="py-4 px-2 text-center">
                   <div className="relative w-16 aspect-square mx-auto">
-                    {imageLoading && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-muted/10">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
-                      </div>
-                    )}
                     <Image
-                      src={imageError ? '/placeholder-image.jpg' : getImageUrl(item.product.image)}
+                      src={getImageUrl(item.product.image)}
                       alt={item.product.name}
-                      key={`${item.product.id}-${Date.now()}`}
                       fill
-                      className={`object-contain rounded-md transition-opacity duration-300 ${
-                        imageLoading ? 'opacity-0' : 'opacity-100'
-                      }`}
-                      sizes="64px"
-                      priority
-                      onError={() => setImageError(true)}
-                      onLoadingComplete={() => setImageLoading(false)}
+                      className="object-cover rounded-md"
+                      onError={() => {
+                        setImageErrors(prev => ({
+                          ...prev,
+                          [item.product.image]: true
+                        }))
+                      }}
                     />
                   </div>
                 </td>

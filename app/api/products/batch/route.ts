@@ -15,6 +15,8 @@ export async function POST(req: Request) {
     
     return Response.json(products)
   } catch (error) {
-    return Response.json({ error: "Failed to fetch products" }, { status: 500 })
+    return Response.json({ 
+      error: error instanceof Error ? error.message : "Failed to process products" 
+    }, { status: 500 })
   }
 } 

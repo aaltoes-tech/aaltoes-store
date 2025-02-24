@@ -48,7 +48,7 @@ export function OrderDetails({ order }: OrderDetailsProps) {
       toast({
         description: "Order ID copied to clipboard"
       })
-    } catch (error) {
+    } catch {
       toast({
         variant: "destructive",
         description: "Failed to copy order ID"

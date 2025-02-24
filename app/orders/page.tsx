@@ -33,6 +33,7 @@ async function getOrders(userId: string) {
             select: {
               id: true,
               name: true,
+              price: true,
               image: true,
               type: true,
               status: true

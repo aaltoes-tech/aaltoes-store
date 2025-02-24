@@ -24,6 +24,7 @@ export default function AdminOrdersPage({ initialOrders }: AdminOrdersPageProps)
   const [search, setSearch] = useState("")
   const { toast } = useToast()
 
+
   const filteredOrders = useMemo(() => {
     if (selectedStatuses.length === 0) return []
     
@@ -45,7 +46,7 @@ export default function AdminOrdersPage({ initialOrders }: AdminOrdersPageProps)
       toast({
         description: "Order ID copied to clipboard"
       })
-    } catch (error) {
+    } catch {
       toast({
         variant: "destructive",
         description: "Failed to copy order ID"

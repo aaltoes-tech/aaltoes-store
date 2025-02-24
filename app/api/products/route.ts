@@ -7,8 +7,6 @@ import { pinata } from "@/app/utils/config"
 import sharp from 'sharp'
 import { type Crop } from 'react-image-crop'
 
-export const runtime = 'edge'
-export const preferredRegion = 'fra1'
 export const revalidate = 3600
 export const dynamic = 'force-dynamic'
 
@@ -89,8 +87,6 @@ export async function POST(req: Request) {
   }
 }
 
-const TIMEOUT = 5000 // 5 seconds
-
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const page = parseInt(searchParams.get('page') || '1')
@@ -113,6 +109,8 @@ export async function GET(req: Request) {
       hasMore: skip + limit < total
     })
   } catch (error) {
-    return Response.json({ error: "Failed to fetch products" }, { status: 500 })
+    return Response.json({ 
+      error: error instanceof Error ? error.message : "Failed to fetch products" 
+    }, { status: 500 })
   }
 } 

@@ -19,9 +19,9 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const [showDetail, setShowDetail] = useState(false)
   const [imageError, setImageError] = useState(false)
   const [imageLoading, setImageLoading] = useState(true)
-  const [showDetail, setShowDetail] = useState(false)
   const needsSize = PRODUCT_TYPE_CONFIG[product.type]?.hasSize
 
   // Show placeholder if no URL or invalid URL
