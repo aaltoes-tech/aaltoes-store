@@ -46,7 +46,10 @@ export function ProductDetail({ product, isOpen, onClose }: ProductDetailProps) 
 
         <div className="flex flex-col sm:grid sm:grid-cols-[1.2fr,0.8fr] gap-4 sm:gap-8">
           {/* Image Section - Made Larger */}
-          <div className="relative aspect-square overflow-hidden rounded-md bg-muted/5">
+          <div 
+            className="relative aspect-square overflow-hidden rounded-md bg-muted/5 cursor-pointer md:cursor-default"
+            onClick={() => onClose()}
+          >
             {imageLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-muted/10">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
@@ -66,6 +69,12 @@ export function ProductDetail({ product, isOpen, onClose }: ProductDetailProps) 
               onError={() => setImageError(true)}
               onLoadingComplete={() => setImageLoading(false)}
             />
+            {/* Mobile close hint */}
+            <div className="absolute bottom-4 left-0 right-0 text-center md:hidden">
+              <p className="text-sm text-white bg-black/50 py-2">
+                Tap image to close
+              </p>
+            </div>
           </div>
 
           {/* Product Details Section */}

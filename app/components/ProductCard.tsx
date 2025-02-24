@@ -45,15 +45,17 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
           
           <Image
-            src={imageError ? '/placeholder-image.jpg' : imageUrl + "?img-height=400&img-format=webp"}
+            src={imageError ? '/placeholder-image.jpg' : imageUrl + "?img-height=800&img-format=webp"}
             alt={product.name}
             fill
             className={`object-cover transition-all duration-300 ${
               imageLoading ? 'opacity-0' : 'opacity-100'
             } group-hover:scale-105`}
-            sizes="(max-width: 400px) 250px, (max-width: 768px) 350px, (max-width: 1024px) 400px, 450px"
-            quality={75}
-            priority={false}
+            sizes="(max-width: 640px) 50vw, 
+                   (max-width: 1024px) 33vw,
+                   25vw"
+            quality={90}
+            priority={true}
             onError={() => setImageError(true)}
             onLoad={() => setImageLoading(false)}
           />
