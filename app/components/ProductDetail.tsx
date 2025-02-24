@@ -1,8 +1,5 @@
 "use client"
 
-import {  Size, PRODUCT_TYPE_CONFIG } from "@/app/lib/constants"
-import { useState } from "react"
-import Image from "next/image"
 import {
   Dialog,
   DialogContent,
@@ -10,15 +7,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { ProductButton } from "./ProductButton"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { PRODUCT_TYPE_CONFIG } from "@/app/lib/constants"
 import { ProductWithDetails } from "@/app/types"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import Image from "next/image"
+import { useState } from "react"
+import { Size } from "@/app/lib/constants"
 
 interface ProductDetailProps {
   product: ProductWithDetails
@@ -27,90 +22,91 @@ interface ProductDetailProps {
 }
 
 export function ProductDetail({ product, isOpen, onClose }: ProductDetailProps) {
-  const [selectedSize, setSelectedSize] = useState<Size>()
+  const [selectedSize, setSelectedSize] = useState<Size | "">("")
   const [imageError, setImageError] = useState(false)
   const [imageLoading, setImageLoading] = useState(true)
-  const needsSize = PRODUCT_TYPE_CONFIG[product.type as keyof typeof PRODUCT_TYPE_CONFIG]?.hasSize
+  const needsSize = PRODUCT_TYPE_CONFIG[product.type]?.hasSize
 
   const imageUrl = product.image && 
     (product.image.startsWith('https') || product.image.startsWith('/')) 
-    ? product.image 
-    : '/placeholder-image.jpg'
+      ? product.image 
+      : '/placeholder-image.jpg'
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[1000px] max-h-[85vh] md:max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl">{product.name}</DialogTitle>
+      <DialogContent className="sm:max-w-[1000px] h-[95vh] sm:h-auto sm:max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+        <DialogHeader className="space-y-1">
+          <div className="flex flex-wrap items-center gap-3 mb-2">
+            <DialogTitle className="text-xl sm:text-2xl">{product.name}</DialogTitle>
+            <Badge className="text-sm sm:text-base px-2 sm:px-3 py-0.5 sm:py-1 bg-foreground text-background hover:bg-foreground/90">
+              {PRODUCT_TYPE_CONFIG[product.type].label}
+            </Badge>
+          </div>
         </DialogHeader>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="w-full aspect-square relative">
+
+        <div className="flex flex-col sm:grid sm:grid-cols-2 gap-4 sm:gap-6">
+          {/* Image Section */}
+          <div className="relative aspect-square overflow-hidden rounded-md">
             {imageLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-muted/10">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
               </div>
             )}
             <Image
-              src={imageError ? '/placeholder-image.jpg' : imageUrl + "?img-height=1200&img-format=webp"}
+              src={imageError ? '/placeholder-image.jpg' : imageUrl}
               alt={product.name}
-              key={product.id}
               fill
-              className={`object-contain rounded-md transition-opacity duration-300 ${
-                imageLoading ? 'opacity-0' : 'opacity-100'
-              }`}
-              sizes="(max-height: 1000px) 100vw, 50vw"
+              className={`
+                object-cover 
+                transition-opacity duration-300
+                ${imageLoading ? 'opacity-0' : 'opacity-100'}
+              `}
+              sizes="(max-width: 768px) 100vw, 50vw"
               priority
               onError={() => setImageError(true)}
-              onLoad={() => setImageLoading(false)}
+              onLoadingComplete={() => setImageLoading(false)}
             />
           </div>
+
+          {/* Product Details Section */}
           <div className="flex flex-col space-y-4">
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold tracking-tight text-foreground">
-                Product Details
+              <h3 className="text-lg sm:text-xl font-semibold">
+                {product.price} €
               </h3>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline">
-                  {PRODUCT_TYPE_CONFIG[product.type].label}
-                </Badge>
-                <span className="text-sm text-muted-foreground">•</span>
-                <span className="text-sm text-muted-foreground">
-                  {product.description}
-                </span>
-              </div>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                {product.description}
+              </p>
             </div>
 
-            <div className="space-y-4">
-              <p className="text-3xl font-bold">{product.price} €</p>
-              
-              {needsSize && (
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Select Size</label>
-                  <Select
-                    value={selectedSize}
-                    onValueChange={(value: Size) => setSelectedSize(value)}
-                  >
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Choose size" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {product.sizes.map((size) => (
-                        <SelectItem key={size} value={size}>
-                          {size}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+            {/* Size Selection */}
+            {needsSize && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Select Size</label>
+                <div className="flex flex-wrap gap-2">
+                  {product.sizes.map((size) => (
+                    <Button
+                      key={size}
+                      variant={selectedSize === size ? "default" : "outline"}
+                      onClick={() => setSelectedSize(size)}
+                      className="px-3 py-1 h-auto text-sm"
+                    >
+                      {size}
+                    </Button>
+                  ))}
                 </div>
-              )}
+              </div>
+            )}
 
-              <ProductButton 
-                className="w-full" 
+            {/* Add to Cart Button - No fixed positioning */}
+            <div className="pt-4">
+              <ProductButton
                 productId={product.id}
-                size={needsSize ? selectedSize : undefined}
+                size={selectedSize}
                 disabled={needsSize && !selectedSize}
                 onSuccess={onClose}
-                closeOnSuccess={false}
+                closeOnSuccess={true}
+                className="w-full"
               />
             </div>
           </div>

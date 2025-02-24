@@ -18,11 +18,11 @@ export function QuantityInput({
   max = 10 
 }: QuantityInputProps) {
   return (
-    <div className="inline-flex h-9 items-center rounded-md border border-input bg-transparent">
+    <div className="inline-flex h-8 sm:h-9 items-center rounded-md border border-input bg-transparent">
       <Button
         variant="ghost"
         size="icon"
-        className="h-9 w-9 rounded-none border-r border-input"
+        className="h-8 w-6 sm:h-9 sm:w-9 rounded-none border-r border-input"
         onClick={() => onChange(Math.max(min, value - 1))}
         disabled={value <= min}
       >
@@ -31,12 +31,12 @@ export function QuantityInput({
       <Input
         readOnly
         value={value}
-        className="h-9 w-12 rounded-none border-0 text-center focus-visible:ring-0"
+        className="h-8 w-8 sm:h-9 sm:w-12 rounded-none border-0 text-center focus-visible:ring-0 text-sm sm:text-base"
       />
       <Button
         variant="ghost"
         size="icon"
-        className="h-9 w-9 rounded-none border-l border-input"
+        className="h-8 w-6 sm:h-9 sm:w-9 rounded-none border-l border-input"
         onClick={() => onChange(Math.min(max, value + 1))}
         disabled={value >= max}
       >
