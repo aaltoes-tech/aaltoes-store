@@ -58,14 +58,17 @@ export function OrderList({ initialOrders }: OrderListProps) {
       const res = await fetch(`/api/orders/${orderId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'CANCELLED' })
+        body: JSON.stringify({ 
+          status: 'CANCELLED',
+          comment: 'Order was cancelled by user'
+        })
       })
 
       if (!res.ok) throw new Error()
 
       setOrders(orders.map(order => 
         order.id === orderId 
-          ? { ...order, status: 'CANCELLED' }
+          ? { ...order, status: 'CANCELLED', comment: 'Order was cancelled by user' }
           : order
       ))
 
@@ -202,7 +205,7 @@ export function OrderList({ initialOrders }: OrderListProps) {
               ))}
             </div>
 
-            {order.status !== "CANCELLED" && (
+            
               <div className="flex justify-between items-center pt-4 border-t">
                 <a
                   href={getContactEmailUrl(order.id)}
@@ -214,14 +217,19 @@ export function OrderList({ initialOrders }: OrderListProps) {
                   <Mail className="h-4 w-4" />
                   Contact Support
                 </a>
+                {order.status !== "CANCELLED" ? (    
                 <div className="text-right">
                   <p className="text-sm font-medium">Total Amount</p>
                   <p className="text-2xl font-bold tracking-tight">
                     {order.total.toFixed(2)} €
                   </p>
                 </div>
+                ) : (
+                  <div className="text-right">
+                    <p className="text-sm font-medium">{order.comment}</p>
+                  </div>
+                )}
               </div>
-            )}
           </div>
         ))
       )}

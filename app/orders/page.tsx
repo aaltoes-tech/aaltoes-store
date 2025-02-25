@@ -23,6 +23,7 @@ async function getOrders(userId: string) {
       status: true,
       total: true,
       createdAt: true,
+      comment: true,
       items: {
         select: {
           id: true,

@@ -31,75 +31,80 @@ export function ProductDetail({ product, isOpen, onClose }: ProductDetailProps) 
       ? product.image 
       : '/placeholder-image.jpg'
 
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[1200px] h-[85vh] sm:h-auto sm:max-h-[90vh] p-0 rounded-lg flex flex-col">
-        {/* Desktop header */}
-        <div className="hidden sm:block p-4 sm:p-6">
-          <DialogHeader className="space-y-1">
-            <div className="flex flex-wrap items-center gap-3 mb-2">
-              <DialogTitle className="text-2xl sm:text-3xl font-bold">{product.name}</DialogTitle>
-              <Badge className="text-base sm:text-lg px-3 py-1 bg-foreground text-background hover:bg-foreground/90">
+      <DialogContent className="sm:max-w-[1200px] h-[85vh] sm:h-auto sm:max-h-[95vh] p-0 rounded-lg flex flex-col">
+        {/* Desktop/Landscape Header */}
+        <div className="hidden landscape:block sm:block px-6 pt-6">
+          <DialogHeader>
+            <div className="flex flex-wrap items-center gap-3">
+              <DialogTitle className="text-xl landscape:text-2xl md:text-3xl lg:text-4xl font-bold">
+                {product.name}
+              </DialogTitle>
+              <Badge className="text-base landscape:text-lg md:text-lg lg:text-xl px-3 py-1 bg-foreground text-background">
                 {PRODUCT_TYPE_CONFIG[product.type].label}
               </Badge>
             </div>
           </DialogHeader>
         </div>
 
-        {/* Main content container */}
-        <div className="flex-1 min-h-0 flex flex-col sm:grid sm:grid-cols-[1.2fr,0.8fr]">
-          {/* Fixed Image Section */}
-          <div className="relative aspect-square flex-shrink-0 cursor-pointer md:cursor-default"
+        {/* Main Content */}
+        <div className="flex-1 min-h-0 flex flex-col landscape:flex-row">
+          {/* Image Container */}
+          <div className="relative aspect-square landscape:w-1/2 landscape:h-[85vh] flex-shrink-0 cursor-pointer landscape:cursor-default md:cursor-default bg-muted/5"
             onClick={() => onClose()}>
-            <Image
+            <Image 
               src={imageError ? '/placeholder-image.jpg' : imageUrl}
               alt={product.name}
               fill
-              className="object-cover"
+              className="object-contain"
               sizes="(max-width: 768px) 100vw, 60vw"
               priority
               onError={() => setImageError(true)}
             />
-            <div className="absolute bottom-4 left-0 right-0 text-center md:hidden">
-              <p className="text-sm text-muted-foreground py-2">
-                Tap image to close
-              </p>
+            <div className="absolute bottom-4 left-0 right-0 text-center landscape:hidden md:hidden">
+              <p className="text-sm text-muted-foreground">Tap image to close</p>
             </div>
           </div>
 
-          {/* Scrollable Content Section */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="p-3 sm:p-6">
-              {/* Mobile Title */}
-              <div className="sm:hidden">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-bold">{product.name}</h2>
-                  <Badge className="text-sm px-2 py-0.5 bg-foreground text-background">
+          {/* Details - Scrollable and Centered */}
+          <div className="landscape:w-1/2 flex-1 overflow-y-auto">
+            <div className="p-6 landscape:p-4 min-h-full landscape:flex landscape:flex-col landscape:justify-center">
+              {/* Mobile Portrait Title */}
+              <div className="portrait:block hidden sm:hidden mb-4">
+                <div className="flex items-center gap-3">
+                  <h2 className="text-2xl sm:text-3xl font-bold">{product.name}</h2>
+                  <Badge className="text-base sm:text-lg px-3 py-1 bg-foreground text-background">
                     {PRODUCT_TYPE_CONFIG[product.type].label}
                   </Badge>
                 </div>
               </div>
 
-              <div className="flex flex-col space-y-4 sm:space-y-6 mt-3 sm:mt-4">
-                <div className="space-y-3 sm:space-y-4">
-                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              {/* Product Info */}
+              <div className="space-y-6 landscape:space-y-8">
+                <div className="space-y-4">
+                  <p className="text-base landscape:text-lg sm:text-lg text-muted-foreground leading-relaxed">
                     {product.description}
                   </p>
-                  <h3 className="text-xl sm:text-2xl font-bold">
+                  <h3 className="text-2xl landscape:text-3xl sm:text-3xl font-bold">
                     {product.price} €
                   </h3>
                 </div>
 
+                {/* Size Selection */}
                 {needsSize && (
-                  <div className="space-y-2 sm:space-y-3">
-                    <label className="text-base sm:text-lg font-medium">Select Size</label>
-                    <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                  <div className="space-y-3">
+                    <label className="text-base landscape:text-lg sm:text-lg font-medium">
+                      Select Size
+                    </label>
+                    <div className="flex flex-wrap gap-2">
                       {product.sizes.map((size) => (
                         <Button
                           key={size}
                           variant={selectedSize === size ? "default" : "outline"}
                           onClick={() => setSelectedSize(size)}
-                          className="px-3 sm:px-4 h-8 sm:h-auto text-sm sm:text-base"
+                          className="px-4 h-10 landscape:h-12 text-base landscape:text-lg"
                         >
                           {size}
                         </Button>
@@ -108,16 +113,15 @@ export function ProductDetail({ product, isOpen, onClose }: ProductDetailProps) 
                   </div>
                 )}
 
-                <div>
-                  <ProductButton
-                    productId={product.id}
-                    size={selectedSize}
-                    disabled={needsSize && !selectedSize}
-                    onSuccess={onClose}
-                    closeOnSuccess={true}
-                    className="w-full text-base sm:text-lg py-4 sm:py-6"
-                  />
-                </div>
+                {/* Add to Cart Button */}
+                <ProductButton
+                  productId={product.id}
+                  size={selectedSize}
+                  disabled={needsSize && !selectedSize}
+                  onSuccess={onClose}
+                  closeOnSuccess={true}
+                  className="w-full text-lg landscape:text-xl py-6"
+                />
               </div>
             </div>
           </div>

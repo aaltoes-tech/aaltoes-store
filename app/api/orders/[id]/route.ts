@@ -15,32 +15,43 @@ export async function PATCH(
   }
 
   try {
-    const { status } = await req.json()
+    const body = await req.json()
+    const { status, comment } = body
 
+    // Check if order exists and user has access
     const order = await prisma.order.findUnique({
-      where: { id: id },
+      where: { id },
       select: { user_id: true }
     })
 
-    if (!order || order.user_id !== session.user.id) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 })
+    if (!order) {
+      return NextResponse.json({ error: "Order not found" }, { status: 404 })
     }
 
-    // If cancelling, delete order items first
+    // For admin actions, skip user check
+    if (session.user.role !== 'Admin') {
+      return NextResponse.json({ error: "Not authorized" }, { status: 403 })
+    }
+
+    // Handle order cancellation
     if (status === "CANCELLED") {
       await prisma.orderItem.deleteMany({
         where: { orderId: id }
       })
     }
 
+    // Update order status and comment
     const updatedOrder = await prisma.order.update({
-      where: { id: id },
-      data: { status }
+      where: { id },
+      data: { 
+        status,
+        ...(comment && { comment })
+      }
     })
 
     return NextResponse.json(updatedOrder)
-  } catch (error) {
-    console.error('Order update error:', error)
+
+  } catch {
     return NextResponse.json(
       { error: "Failed to update order" },
       { status: 500 }

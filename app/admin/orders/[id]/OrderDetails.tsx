@@ -194,7 +194,7 @@ export function OrderDetails({ order }: OrderDetailsProps) {
 
         {/* Only show action buttons if order is not cancelled */}
         {order.status !== "CANCELLED" && (
-          <div className="border-t pt-4">
+          <div className="pt-4">
             <div className="flex justify-end">
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">Total Amount</p>

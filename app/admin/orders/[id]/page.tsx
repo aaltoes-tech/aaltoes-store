@@ -64,9 +64,11 @@ export default async function AdminOrderPage({
   }
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <Navbar />
-      <OrderDetails order={order} />
-    </>
+      <div className="flex-1 container max-w-6xl mx-auto p-6">
+        <OrderDetails order={order} />
+      </div>
+    </div>
   )
 } 
