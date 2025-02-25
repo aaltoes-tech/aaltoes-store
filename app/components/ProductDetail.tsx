@@ -31,15 +31,6 @@ export function ProductDetail({ product, isOpen, onClose }: ProductDetailProps) 
       ? product.image 
       : '/placeholder-image.jpg'
 
-  const imageProps = {
-    src: imageError ? '/placeholder-image.jpg' : imageUrl,
-    alt: product.name,
-    fill: true,
-    className: "object-contain",
-    sizes: "(max-width: 768px) 100vw, 60vw",
-    priority: true,
-    onError: () => setImageError(true)
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
