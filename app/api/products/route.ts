@@ -66,34 +66,23 @@ export async function POST(req: Request) {
     })
     
     try {
-      const productData = {
-        name: formData.get('name') as string,
-        description: formData.get('description') as string,
-        price: parseFloat(formData.get('price') as string),
-        image: imageUrl,
-        type: formData.get('type') as ProductType,
-        sizes: JSON.parse(formData.get('sizes') as string) as Size[],
-        status: 'active' as const
-      }
-      
-      console.log('Product data to create:', productData)
-      
       const product = await prisma.product.create({
-        data: productData
+        data: {
+          name: formData.get('name') as string,
+          description: formData.get('description') as string,
+          price: parseFloat(formData.get('price') as string),
+          image: imageUrl,
+          type: formData.get('type') as ProductType,
+          sizes: JSON.parse(formData.get('sizes') as string) as Size[],
+          status: 'active'
+        }
       })
 
-      if (!product) {
-        return NextResponse.json(
-          { error: "Failed to create product" },
-          { status: 500 }
-        )
-      }
-
-      return NextResponse.json({ data: product })
-    } catch (prismaError) {
-      console.error('Prisma error:', prismaError)
+      return NextResponse.json(product)
+    } catch (error) {
+      console.error('Create product error:', error)
       return NextResponse.json(
-        { error: prismaError instanceof Error ? prismaError.message : "Database error while creating product" },
+        { error: "Failed to create product" },
         { status: 500 }
       )
     }
