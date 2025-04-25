@@ -34,7 +34,7 @@ export function ProductDetail({ product, isOpen, onClose }: ProductDetailProps) 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[1200px] h-[85vh] sm:h-auto sm:max-h-[95vh] p-0 rounded-lg flex flex-col">
+      <DialogContent className="sm:max-w-[1200px] h-[85vh] sm:h-auto sm:max-h-[95vh] p-0 rounded-lg flex flex-col [&>button]:!ring-0 [&>button]:!ring-offset-0">
         {/* Desktop/Landscape Header */}
         <div className="hidden landscape:block sm:block px-6 pt-6">
           <DialogHeader>
@@ -52,8 +52,7 @@ export function ProductDetail({ product, isOpen, onClose }: ProductDetailProps) 
         {/* Main Content */}
         <div className="flex-1 min-h-0 flex flex-col landscape:flex-row">
           {/* Image Container */}
-          <div className="relative aspect-square landscape:w-1/2 landscape:h-[85vh] flex-shrink-0 cursor-pointer landscape:cursor-default md:cursor-default bg-muted/5"
-            onClick={() => onClose()}>
+          <div className="relative aspect-square landscape:w-1/2 landscape:h-[85vh] flex-shrink-0 cursor-pointer landscape:cursor-default md:cursor-default bg-muted/5">
             <Image 
               src={imageError ? '/placeholder-image.jpg' : imageUrl}
               alt={product.name}
@@ -114,14 +113,22 @@ export function ProductDetail({ product, isOpen, onClose }: ProductDetailProps) 
                 )}
 
                 {/* Add to Cart Button */}
-                <ProductButton
-                  productId={product.id}
-                  size={selectedSize}
-                  disabled={needsSize && !selectedSize}
-                  onSuccess={onClose}
-                  closeOnSuccess={true}
-                  className="w-full text-lg landscape:text-xl py-6"
-                />
+                <div className="mt-6">
+                  {!product.limited ? (
+                    <ProductButton
+                      productId={product.id}
+                      size={selectedSize}
+                      disabled={needsSize && !selectedSize}
+                      onSuccess={onClose}
+                      closeOnSuccess={true}
+                      className="w-full text-lg landscape:text-xl py-6"
+                    />
+                  ) : (
+                    <div className="text-center text-muted-foreground mt-4 w-full text-sm md:text-base !ring-0 !ring-offset-0 focus:!ring-0 focus:!ring-offset-0 focus-visible:!ring-0 focus-visible:!ring-offset-0 hover:!ring-0 hover:!ring-offset-0">
+                      This item is limited edition
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

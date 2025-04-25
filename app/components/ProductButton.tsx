@@ -58,7 +58,7 @@ export function ProductButton({ className, productId, size, disabled, onSuccess,
       variant="default" 
       onClick={handleClick}
       disabled={disabled}
-      className={`mt-4 w-full text-sm md:text-base ${className || ''}`}
+      className={`mt-4 w-full text-sm md:text-base !ring-0 !ring-offset-0 focus:!ring-0 focus:!ring-offset-0 focus-visible:!ring-0 focus-visible:!ring-offset-0 hover:!ring-0 hover:!ring-offset-0 ${className || ''}`}
     >
       {disabled ? "Select a size" : "Add to Cart"}
     </Button>

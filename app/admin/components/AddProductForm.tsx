@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select"
 import { PRODUCT_TYPE_CONFIG } from "@/app/lib/constants"
 import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Size as PrismaSize, ProductType as PrismaProductType } from "@prisma/client"
 import { InputFile } from "@/app/components/ui/input-file"
 import { type Crop } from 'react-image-crop'
@@ -32,6 +33,7 @@ export function AddProductForm({ onClose, onSuccess }: AddProductFormProps) {
   const [sizes, setSizes] = useState<PrismaSize[]>([])
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [cropData, setCropData] = useState<Crop | null>(null)
+  const [limited, setLimited] = useState(false)
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -47,6 +49,7 @@ export function AddProductForm({ onClose, onSuccess }: AddProductFormProps) {
     formData.append('type', type)
     formData.append('sizes', JSON.stringify(sizes))
     formData.append('status', 'active')
+    formData.append('limited', limited ? 'on' : 'off')
 
     try {
       const response = await fetch('/api/products', {
@@ -169,6 +172,19 @@ export function AddProductForm({ onClose, onSuccess }: AddProductFormProps) {
           placeholder="Product description"
           required
         />
+      </div>
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="limited"
+          checked={limited}
+          onCheckedChange={(checked) => setLimited(checked as boolean)}
+        />
+        <Label
+          htmlFor="limited"
+          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        >
+          Limited Edition
+        </Label>
       </div>
       <Button 
         type="submit" 
