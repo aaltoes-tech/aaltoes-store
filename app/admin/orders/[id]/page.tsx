@@ -29,7 +29,8 @@ async function getOrder(orderId: string) {
               status: true,
               createdAt: true,
               updatedAt: true,
-              sizes: true
+              sizes: true,
+              limited: true
             }
           }
         }

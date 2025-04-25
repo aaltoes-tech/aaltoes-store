@@ -74,7 +74,8 @@ export async function POST(req: Request) {
           image: imageUrl,
           type: formData.get('type') as ProductType,
           sizes: JSON.parse(formData.get('sizes') as string) as Size[],
-          status: 'active'
+          status: 'active',
+          limited: formData.get('limited') === 'on'
         }
       })
 
