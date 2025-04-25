@@ -24,14 +24,9 @@ export const PRODUCT_TYPE_CONFIG: ProductConfig = {
     label: "Hat",
     hasSize: true
   },
-  STICKER: {
+  OTHER: {
     sizes: ["ONESIZE"],
-    label: "Sticker",
-    hasSize: false
-  },
-  MUG: {
-    sizes: ["ONESIZE"],
-    label: "Mug",
+    label: "Other",
     hasSize: false
   }
 } as const

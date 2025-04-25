@@ -55,7 +55,7 @@ export async function POST(req: Request) {
     const uploadData = await pinata.upload.file(croppedFile)
     const imageUrl = `https://${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${uploadData.IpfsHash}`
 
-    console.log({
+    console.log('Form data:', {
       name: formData.get('name'),
       price: formData.get('price'),
       description: formData.get('description'),
@@ -65,23 +65,42 @@ export async function POST(req: Request) {
       sizes: formData.get('sizes')
     })
     
-    const product = await prisma.product.create({
-      data: {
+    try {
+      const productData = {
         name: formData.get('name') as string,
         description: formData.get('description') as string,
         price: parseFloat(formData.get('price') as string),
         image: imageUrl,
         type: formData.get('type') as ProductType,
         sizes: JSON.parse(formData.get('sizes') as string) as Size[],
-        status: 'active'
+        status: 'active' as const
       }
-    })
+      
+      console.log('Product data to create:', productData)
+      
+      const product = await prisma.product.create({
+        data: productData
+      })
 
-    return NextResponse.json(product)
+      if (!product) {
+        return NextResponse.json(
+          { error: "Failed to create product" },
+          { status: 500 }
+        )
+      }
+
+      return NextResponse.json({ data: product })
+    } catch (prismaError) {
+      console.error('Prisma error:', prismaError)
+      return NextResponse.json(
+        { error: prismaError instanceof Error ? prismaError.message : "Database error while creating product" },
+        { status: 500 }
+      )
+    }
   } catch (error) {
     console.error('Create product error:', error)
     return NextResponse.json(
-      { error: "Failed to create product" },
+      { error: error instanceof Error ? error.message : "Failed to create product" },
       { status: 500 }
     )
   }

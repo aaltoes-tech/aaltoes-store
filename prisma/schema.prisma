@@ -15,27 +15,27 @@ model User {
   emailVerified DateTime?
   image         String    @default("/placeholder-image.jpg")
   role          String    @default("User")
-  accounts      Account[]
-  sessions      Session[]
-  cart          Cart[]
-  orders        Order[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  cart          Cart[]
+  orders        Order[]
+  sessions      Session[]
 
   @@map("users")
 }
 
 model Product {
-  id          String      @id @default(cuid())
+  id          String        @id @default(cuid())
   name        String
   description String
   price       Float
-  image       String      @default("/placeholder-image.jpg")
+  image       String        @default("/placeholder-image.jpg")
   type        ProductType
-  sizes       Size[]      @default([])
+  sizes       Size[]        @default([])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
   status      ProductStatus @default(active)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
   cartItems   CartItem[]
   orderItems  OrderItem[]
 
@@ -45,72 +45,70 @@ model Product {
 model Cart {
   id        String     @id @default(cuid())
   user_id   String
-  user      User       @relation(fields: [user_id], references: [id])
-  items     CartItem[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  items     CartItem[]
+  user      User       @relation(fields: [user_id], references: [id])
 
   @@map("carts")
 }
 
 model CartItem {
   id        String  @id @default(cuid())
-  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
   cartId    String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String
   quantity  Int     @default(1)
-  size      Size?   // Optional because not all products have sizes
+  size      Size?
+  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@map("cart_items")
 }
 
 model Order {
-  id        String      @id @default(cuid())
-  user_id   String
-  user      User        @relation(fields: [user_id], references: [id])
-  items     OrderItem[]
-  status    OrderStatus @default(PENDING)
-  phone_number String @default("")
-  comment   String      @default("")
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  total     Float
+  id           String      @id @default(cuid())
+  user_id      String
+  status       OrderStatus @default(PENDING)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  total        Float
+  comment      String      @default("")
+  phone_number String      @default("")
+  items        OrderItem[]
+  user         User        @relation(fields: [user_id], references: [id])
 
   @@map("orders")
 }
 
 model OrderItem {
   id        String  @id @default(cuid())
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId   String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String
   quantity  Int     @default(1)
   total     Float
-  size      Size?   // Add size field to match CartItem
+  size      Size?
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@map("order_items")
 }
 
 model Account {
-  id                String  @id @default(cuid())
+  id                String   @id @default(cuid())
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
@@ -120,10 +118,9 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   @@map("sessions")
 }
@@ -147,8 +144,7 @@ enum OrderStatus {
 enum ProductType {
   TSHIRT
   HOODIE
-  STICKER
-  MUG
+  OTHER
   HAT
 }
 
