@@ -35,6 +35,7 @@ export function ProductDetail({ product, isOpen, onClose }: ProductDetailProps) 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[1200px] h-[85vh] sm:h-auto sm:max-h-[95vh] p-0 rounded-lg flex flex-col [&>button]:!ring-0 [&>button]:!ring-offset-0">
+
         {/* Desktop/Landscape Header */}
         <div className="hidden landscape:block sm:block px-6 pt-6">
           <DialogHeader>
@@ -52,7 +53,9 @@ export function ProductDetail({ product, isOpen, onClose }: ProductDetailProps) 
         {/* Main Content */}
         <div className="flex-1 min-h-0 flex flex-col landscape:flex-row">
           {/* Image Container */}
-          <div className="relative aspect-square landscape:w-1/2 landscape:h-[85vh] flex-shrink-0 cursor-pointer landscape:cursor-default md:cursor-default bg-muted/5">
+
+          <div className="relative aspect-square landscape:w-1/2 landscape:h-[85vh] flex-shrink-0 cursor-pointer landscape:cursor-default md:cursor-default bg-muted/5"
+            onClick={() => onClose()}>
             <Image 
               src={imageError ? '/placeholder-image.jpg' : imageUrl}
               alt={product.name}
@@ -129,6 +132,7 @@ export function ProductDetail({ product, isOpen, onClose }: ProductDetailProps) 
                     </div>
                   )}
                 </div>
+
               </div>
             </div>
           </div>
