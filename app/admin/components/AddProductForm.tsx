@@ -54,7 +54,10 @@ export function AddProductForm({ onClose, onSuccess }: AddProductFormProps) {
         body: formData,
       })
       
-      if (!response.ok) throw new Error()
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to create product')
+      }
       
       toast({
         title: "Success",
