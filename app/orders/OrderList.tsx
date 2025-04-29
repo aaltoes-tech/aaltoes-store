@@ -12,6 +12,8 @@ import { truncateId } from "@/app/utils/utils"
 import { Copy, Mail } from "@geist-ui/icons"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
+import { cancelOrder as cancelOrderAction } from "@/app/admin/orders/actions"
+import { useRouter } from "next/navigation"
 
 interface OrderItem {
   id: string
@@ -43,7 +45,7 @@ interface OrderListProps {
 }
 
 export function OrderList({ initialOrders }: OrderListProps) {
-  const [orders, setOrders] = useState(initialOrders)
+  const [orders] = useState(initialOrders)
   const [loading, setLoading] = useState(false)
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([
     "PENDING",
@@ -51,30 +53,24 @@ export function OrderList({ initialOrders }: OrderListProps) {
   ])
   const { toast } = useToast()
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({})
+  const router = useRouter()
 
-  async function cancelOrder(orderId: string) {
-    setLoading(true)
+  const handleCancelOrder = async (orderId: string) => {
     try {
-      const res = await fetch(`/api/orders/${orderId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          status: 'CANCELLED',
-          comment: 'Order was cancelled by user'
+      setLoading(true)
+      const result = await cancelOrderAction(orderId, 'Order was cancelled by user')
+      if (result.success) {
+        toast({
+          description: "Order cancelled successfully"
         })
-      })
-
-      if (!res.ok) throw new Error()
-
-      setOrders(orders.map(order => 
-        order.id === orderId 
-          ? { ...order, status: 'CANCELLED', comment: 'Order was cancelled by user' }
-          : order
-      ))
-
-      toast({
-        description: "Order cancelled successfully"
-      })
+        // Refresh the orders list
+        router.refresh()
+      } else {
+        toast({
+          variant: "destructive",
+          description: "Failed to cancel order"
+        })
+      }
     } catch {
       toast({
         variant: "destructive",
@@ -168,7 +164,7 @@ export function OrderList({ initialOrders }: OrderListProps) {
                     size="sm"
                     className="text-muted-foreground hover:text-destructive"
                     disabled={loading}
-                    onClick={() => cancelOrder(order.id)}
+                    onClick={() => handleCancelOrder(order.id)}
                   >
                     {loading ? "Cancelling..." : "Cancel"}
                   </Button>

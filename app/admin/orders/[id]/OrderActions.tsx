@@ -12,7 +12,7 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
-import { completeOrder } from "../actions"
+import { completeOrder, cancelOrder } from "../actions"
 
 export function OrderActions({ orderId }: { orderId: string }) {
   const router = useRouter()
@@ -31,16 +31,9 @@ export function OrderActions({ orderId }: { orderId: string }) {
 
     setIsLoading(true)
     try {
-      const res = await fetch(`/api/orders/${orderId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          status: 'CANCELLED',
-          comment: cancelReason 
-        })
-      })
-
-      if (!res.ok) throw new Error()
+      const result = await cancelOrder(orderId, cancelReason)
+      
+      if (!result.success) throw new Error()
 
       toast({
         title: "Order cancelled successfully",
@@ -58,62 +51,61 @@ export function OrderActions({ orderId }: { orderId: string }) {
   }
 
   return (
-    
-      <div className="flex justify-center gap-4 py-8">
-        <Button 
-          variant="destructive" 
-          onClick={() => setShowCancelDialog(true)}
-        >
-          Cancel Order
+    <div className="flex justify-center gap-4 py-8">
+      <Button 
+        variant="destructive" 
+        onClick={() => setShowCancelDialog(true)}
+      >
+        Cancel Order
+      </Button>
+
+      <form action={async () => {
+        await completeOrder(orderId)
+        toast({
+          description: "Order completed successfully"
+        })
+        router.refresh()
+      }}>
+        <Button type="submit">
+          Complete Order
         </Button>
+      </form>
 
-        <form action={async () => {
-          await completeOrder(orderId)
-          toast({
-            description: "Order completed successfully"
-          })
-          router.refresh()
-        }}>
-          <Button type="submit">
-            Complete Order
-          </Button>
-        </form>
+      <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel Order</DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <label className="text-sm font-medium mb-2 block">
+              Reason for Cancellation (Required)
+            </label>
+            <Textarea
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              placeholder="Please provide a reason for cancelling this order..."
+              className="min-h-[100px]"
+            />
+          </div>
 
-        <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Cancel Order</DialogTitle>
-            </DialogHeader>
-            
-            <div className="py-4">
-              <label className="text-sm font-medium mb-2 block">
-                Reason for Cancellation (Required)
-              </label>
-              <Textarea
-                value={cancelReason}
-                onChange={(e) => setCancelReason(e.target.value)}
-                placeholder="Please provide a reason for cancelling this order..."
-                className="min-h-[100px]"
-              />
-            </div>
-
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setShowCancelDialog(false)}
-              >
-                Back
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleCancel}
-                disabled={isLoading}
-              >
-                {isLoading ? "Cancelling..." : "Confirm Cancel"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowCancelDialog(false)}
+            >
+              Back
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleCancel}
+              disabled={isLoading}
+            >
+              {isLoading ? "Cancelling..." : "Confirm Cancel"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   )
 } 
