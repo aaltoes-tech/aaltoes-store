@@ -45,7 +45,7 @@ interface OrderListProps {
 }
 
 export function OrderList({ initialOrders }: OrderListProps) {
-  const [orders] = useState(initialOrders)
+  const [orders, setOrders] = useState(initialOrders)
   const [loading, setLoading] = useState(false)
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([
     "PENDING",
@@ -53,7 +53,6 @@ export function OrderList({ initialOrders }: OrderListProps) {
   ])
   const { toast } = useToast()
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({})
-  const router = useRouter()
 
   const refreshOrders = async () => {
     const updatedOrders = await getOrders()
