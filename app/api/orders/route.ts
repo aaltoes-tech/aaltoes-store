@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
 import { authOptions } from "@/lib/auth"
+import { sendOrderConfirmationEmail } from "@/app/utils/send-email"
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
@@ -24,8 +25,11 @@ export async function POST(req: Request) {
               product: {
                 select: {
                   id: true,
+                  name: true,
                   price: true,
-                  status: true
+                  type: true,
+                  status: true,
+                  image: true
                 }
               }
             }
@@ -60,6 +64,26 @@ export async function POST(req: Request) {
               total: item.quantity * item.product.price
             }))
           }
+        },
+        include: {
+          user: {
+            select: {
+              name: true,
+              email: true
+            }
+          },
+          items: {
+            include: {
+              product: {
+                select: {
+                  name: true,
+                  price: true,
+                  type: true,
+                  image: true
+                }
+              }
+            }
+          }
         }
       })
 
@@ -70,6 +94,9 @@ export async function POST(req: Request) {
 
       return order
     })
+
+    // Send confirmation email
+    await sendOrderConfirmationEmail(order)
 
     return NextResponse.json(order)
   } catch (error) {
