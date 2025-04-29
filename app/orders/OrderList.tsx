@@ -13,7 +13,7 @@ import { Copy, Mail } from "@geist-ui/icons"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { cancelOrder as cancelOrderAction } from "@/app/admin/orders/actions"
-import { useRouter } from "next/navigation"
+import { getOrders } from "./actions"
 
 interface OrderItem {
   id: string
@@ -53,7 +53,11 @@ export function OrderList({ initialOrders }: OrderListProps) {
   ])
   const { toast } = useToast()
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({})
-  const router = useRouter()
+
+  const refreshOrders = async () => {
+    const updatedOrders = await getOrders()
+    setOrders(updatedOrders)
+  }
 
   const handleCancelOrder = async (orderId: string) => {
     try {
@@ -63,14 +67,8 @@ export function OrderList({ initialOrders }: OrderListProps) {
         toast({
           description: "Order cancelled successfully"
         })
-        // Update the orders list locally
-        setOrders(orders.map(order => 
-          order.id === orderId 
-            ? { ...order, status: 'CANCELLED', comment: 'Order was cancelled by user' }
-            : order
-        ))
-        // Refresh the page to get the latest data
-        router.refresh()
+        // Refresh orders without page refresh
+        await refreshOrders()
       } else {
         toast({
           variant: "destructive",
@@ -172,7 +170,7 @@ export function OrderList({ initialOrders }: OrderListProps) {
                     disabled={loading}
                     onClick={() => handleCancelOrder(order.id)}
                   >
-                    {"Cancel"}
+                    Cancel
                   </Button>
                 )}
               </div>
@@ -207,31 +205,30 @@ export function OrderList({ initialOrders }: OrderListProps) {
               ))}
             </div>
 
-            
-              <div className="flex justify-between items-center pt-4 border-t">
-                <a
-                  href={getContactEmailUrl(order.id)}
-                  className={cn(
-                    buttonVariants({ variant: "outline", size: "sm" }),
-                    "gap-2"
-                  )}
-                >
-                  <Mail className="h-4 w-4" />
-                  Contact Support
-                </a>
-                {order.status !== "CANCELLED" ? (    
+            <div className="flex justify-between items-center pt-4 border-t">
+              <a
+                href={getContactEmailUrl(order.id)}
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "sm" }),
+                  "gap-2"
+                )}
+              >
+                <Mail className="h-4 w-4" />
+                Contact Support
+              </a>
+              {order.status !== "CANCELLED" ? (    
                 <div className="text-right">
                   <p className="text-sm font-medium">Total Amount</p>
                   <p className="text-2xl font-bold tracking-tight">
                     {order.total.toFixed(2)} €
                   </p>
                 </div>
-                ) : (
-                  <div className="text-right">
-                    <p className="text-sm font-medium">{order.comment}</p>
-                  </div>
-                )}
-              </div>
+              ) : (
+                <div className="text-right">
+                  <p className="text-sm font-medium">{order.comment}</p>
+                </div>
+              )}
+            </div>
           </div>
         ))
       )}
