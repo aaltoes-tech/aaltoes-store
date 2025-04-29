@@ -45,7 +45,7 @@ interface OrderListProps {
 }
 
 export function OrderList({ initialOrders }: OrderListProps) {
-  const [orders] = useState(initialOrders)
+  const [orders, setOrders] = useState(initialOrders)
   const [loading, setLoading] = useState(false)
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([
     "PENDING",
@@ -63,7 +63,13 @@ export function OrderList({ initialOrders }: OrderListProps) {
         toast({
           description: "Order cancelled successfully"
         })
-        // Refresh the orders list
+        // Update the orders list locally
+        setOrders(orders.map(order => 
+          order.id === orderId 
+            ? { ...order, status: 'CANCELLED', comment: 'Order was cancelled by user' }
+            : order
+        ))
+        // Refresh the page to get the latest data
         router.refresh()
       } else {
         toast({
@@ -166,7 +172,7 @@ export function OrderList({ initialOrders }: OrderListProps) {
                     disabled={loading}
                     onClick={() => handleCancelOrder(order.id)}
                   >
-                    {loading ? "Cancelling..." : "Cancel"}
+                    {"Cancel"}
                   </Button>
                 )}
               </div>
