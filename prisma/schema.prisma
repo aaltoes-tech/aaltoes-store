@@ -67,16 +67,17 @@ model CartItem {
 }
 
 model Order {
-  id           String      @id @default(cuid())
-  user_id      String
-  status       OrderStatus @default(PENDING)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  total        Float
-  comment      String      @default("")
-  phone_number String      @default("")
-  items        OrderItem[]
-  user         User        @relation(fields: [user_id], references: [id])
+  id              String      @id @default(cuid())
+  user_id         String
+  status          OrderStatus @default(PENDING)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  total           Float
+  comment         String      @default("")
+  phone_number    String      @default("")
+  email_message_id String?    // Store the Message-ID of the confirmation email
+  items           OrderItem[]
+  user            User        @relation(fields: [user_id], references: [id])
 
   @@map("orders")
 }

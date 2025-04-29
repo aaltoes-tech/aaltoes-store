@@ -20,6 +20,12 @@ export function generateOrderConfirmationEmail(order: {
   phone_number?: string;
   comment?: string;
 }) {
+  const formattedDate = new Date(order.createdAt).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+
   return `
     <!DOCTYPE html>
     <html>
@@ -108,6 +114,7 @@ export function generateOrderConfirmationEmail(order: {
             font-size: 18px;
             margin-top: 24px;
             padding-top: 24px;
+            border-top: 2px solid #e5e7eb;
             color: #111827;
           }
           .footer {
@@ -117,16 +124,6 @@ export function generateOrderConfirmationEmail(order: {
             color: #6b7280;
             padding-top: 24px;
             border-top: 1px solid #e5e7eb;
-          }
-          .status {
-            display: inline-block;
-            padding: 4px 8px;
-            background-color: #111827;
-            color: white;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
-            margin-left: 8px;
           }
           .badge {
             display: inline-block;
@@ -156,13 +153,13 @@ export function generateOrderConfirmationEmail(order: {
           </div>
           <div class="header-content" style="text-align: center;">
             <h1>Order Confirmation</h1>
-            <p>Admin will review your order and get back to you soon.</p>
+            <p>Thank you for your order! We will process it as soon as possible.</p>
           </div>
 
           <div class="order-info">
             <h2>Order Details</h2>
             <p><strong>Order ID:</strong> ${order.id}</p>
-            <p><strong>Order Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}</p>
+            <p><strong>Order Date:</strong> ${formattedDate}</p>
             <p><strong>Customer:</strong> ${order.user.name || 'N/A'}</p>
             <p><strong>Email:</strong> ${order.user.email}</p>
             ${order.phone_number ? `<p><strong>Phone:</strong> ${order.phone_number}</p>` : ''}
@@ -201,7 +198,6 @@ export function generateOrderConfirmationEmail(order: {
                 `).join('')}
               </tbody>
             </table>
-            
           </div>
 
           <div class="total">
@@ -210,7 +206,6 @@ export function generateOrderConfirmationEmail(order: {
 
           <div class="footer">
             <p>If you have any questions about your order, please contact us at <a href="mailto:board@aaltoes.com" style="color: #111827; text-decoration: none;">board@aaltoes.com</a></p>
-            <p>Thank you for shopping with Aaltoes!</p>
           </div>
         </div>
       </body>
